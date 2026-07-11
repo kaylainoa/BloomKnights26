@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import ReferralModal from './components/ReferralModal'
+import ReferralLoadingScreen from './components/ReferralLoadingScreen'
 import Hero from './components/homeowner/Hero'
 import AddressSearch from './components/homeowner/AddressSearch'
 import LoadingScreen from './components/homeowner/LoadingScreen'
@@ -24,6 +25,7 @@ export default function App() {
 
   // Shared referral modal state
   const [referral, setReferral] = useState({ open: false, target: null, decision: null })
+  const [referralLoading, setReferralLoading] = useState(false)
 
   useEffect(() => {
     getTractScores().then((fc) => {
@@ -43,8 +45,15 @@ export default function App() {
   }
 
   async function openReferral(target, amount) {
-    const res = await referToLender(target, { amount })
-    setReferral({ open: true, target, decision: res })
+    setReferral({ open: false, target, decision: null })
+    setReferralLoading(true)
+
+    try {
+      const res = await referToLender(target, { amount })
+      setReferral({ open: true, target, decision: res })
+    } finally {
+      setReferralLoading(false)
+    }
   }
 
   function closeReferral() {
@@ -123,6 +132,7 @@ export default function App() {
         )}
       </main>
 
+      {referralLoading && <ReferralLoadingScreen target={referral.target} />}
       <ReferralModal
         open={referral.open}
         onClose={closeReferral}
