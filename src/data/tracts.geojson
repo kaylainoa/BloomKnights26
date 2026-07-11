@@ -1,0 +1,551 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001000101",
+        "name": "Tract 1.01",
+        "opportunity_score": 85,
+        "avg_savings_mo": 185,
+        "adoption_pct": 4,
+        "energy_burden_pct": 9.8,
+        "household_count": 1120
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.369,
+              29.6685
+            ],
+            [
+              -82.34100000000001,
+              29.6685
+            ],
+            [
+              -82.34100000000001,
+              29.6965
+            ],
+            [
+              -82.369,
+              29.6965
+            ],
+            [
+              -82.369,
+              29.6685
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001000102",
+        "name": "Tract 1.02",
+        "opportunity_score": 79,
+        "avg_savings_mo": 165,
+        "adoption_pct": 6,
+        "energy_burden_pct": 9.1,
+        "household_count": 980
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.339,
+              29.6685
+            ],
+            [
+              -82.311,
+              29.6685
+            ],
+            [
+              -82.311,
+              29.6965
+            ],
+            [
+              -82.339,
+              29.6965
+            ],
+            [
+              -82.339,
+              29.6685
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001000201",
+        "name": "Tract 2.01",
+        "opportunity_score": 40,
+        "avg_savings_mo": 90,
+        "adoption_pct": 22,
+        "energy_burden_pct": 4.2,
+        "household_count": 1340
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.309,
+              29.6685
+            ],
+            [
+              -82.281,
+              29.6685
+            ],
+            [
+              -82.281,
+              29.6965
+            ],
+            [
+              -82.309,
+              29.6965
+            ],
+            [
+              -82.309,
+              29.6685
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001000700",
+        "name": "Tract 7",
+        "opportunity_score": 94,
+        "avg_savings_mo": 205,
+        "adoption_pct": 3,
+        "energy_burden_pct": 11.4,
+        "household_count": 860
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.369,
+              29.6385
+            ],
+            [
+              -82.34100000000001,
+              29.6385
+            ],
+            [
+              -82.34100000000001,
+              29.6665
+            ],
+            [
+              -82.369,
+              29.6665
+            ],
+            [
+              -82.369,
+              29.6385
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001000800",
+        "name": "Tract 8",
+        "opportunity_score": 65,
+        "avg_savings_mo": 140,
+        "adoption_pct": 12,
+        "energy_burden_pct": 7.5,
+        "household_count": 1510
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.339,
+              29.6385
+            ],
+            [
+              -82.311,
+              29.6385
+            ],
+            [
+              -82.311,
+              29.6665
+            ],
+            [
+              -82.339,
+              29.6665
+            ],
+            [
+              -82.339,
+              29.6385
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001000900",
+        "name": "Tract 9",
+        "opportunity_score": 32,
+        "avg_savings_mo": 75,
+        "adoption_pct": 28,
+        "energy_burden_pct": 3.8,
+        "household_count": 990
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.309,
+              29.6385
+            ],
+            [
+              -82.281,
+              29.6385
+            ],
+            [
+              -82.281,
+              29.6665
+            ],
+            [
+              -82.309,
+              29.6665
+            ],
+            [
+              -82.309,
+              29.6385
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001001001",
+        "name": "Tract 10.01",
+        "opportunity_score": 23,
+        "avg_savings_mo": 60,
+        "adoption_pct": 34,
+        "energy_burden_pct": 3.1,
+        "household_count": 1200
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.279,
+              29.6385
+            ],
+            [
+              -82.251,
+              29.6385
+            ],
+            [
+              -82.251,
+              29.6665
+            ],
+            [
+              -82.279,
+              29.6665
+            ],
+            [
+              -82.279,
+              29.6385
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001001300",
+        "name": "Tract 13",
+        "opportunity_score": 84,
+        "avg_savings_mo": 175,
+        "adoption_pct": 5,
+        "energy_burden_pct": 10.2,
+        "household_count": 1050
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.369,
+              29.6085
+            ],
+            [
+              -82.34100000000001,
+              29.6085
+            ],
+            [
+              -82.34100000000001,
+              29.636499999999998
+            ],
+            [
+              -82.369,
+              29.636499999999998
+            ],
+            [
+              -82.369,
+              29.6085
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001001400",
+        "name": "Tract 14",
+        "opportunity_score": 57,
+        "avg_savings_mo": 120,
+        "adoption_pct": 15,
+        "energy_burden_pct": 6.4,
+        "household_count": 1420
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.339,
+              29.6085
+            ],
+            [
+              -82.311,
+              29.6085
+            ],
+            [
+              -82.311,
+              29.636499999999998
+            ],
+            [
+              -82.339,
+              29.636499999999998
+            ],
+            [
+              -82.339,
+              29.6085
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001001500",
+        "name": "Tract 15",
+        "opportunity_score": 91,
+        "avg_savings_mo": 195,
+        "adoption_pct": 2,
+        "energy_burden_pct": 10.9,
+        "household_count": 780
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.309,
+              29.6085
+            ],
+            [
+              -82.281,
+              29.6085
+            ],
+            [
+              -82.281,
+              29.636499999999998
+            ],
+            [
+              -82.309,
+              29.636499999999998
+            ],
+            [
+              -82.309,
+              29.6085
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001002101",
+        "name": "Tract 21.01",
+        "opportunity_score": 16,
+        "avg_savings_mo": 45,
+        "adoption_pct": 38,
+        "energy_burden_pct": 2.6,
+        "household_count": 1610
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.279,
+              29.6085
+            ],
+            [
+              -82.251,
+              29.6085
+            ],
+            [
+              -82.251,
+              29.636499999999998
+            ],
+            [
+              -82.279,
+              29.636499999999998
+            ],
+            [
+              -82.279,
+              29.6085
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001002102",
+        "name": "Tract 21.02",
+        "opportunity_score": 49,
+        "avg_savings_mo": 100,
+        "adoption_pct": 18,
+        "energy_burden_pct": 5.5,
+        "household_count": 1180
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.339,
+              29.578500000000002
+            ],
+            [
+              -82.311,
+              29.578500000000002
+            ],
+            [
+              -82.311,
+              29.6065
+            ],
+            [
+              -82.339,
+              29.6065
+            ],
+            [
+              -82.339,
+              29.578500000000002
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001002200",
+        "name": "Tract 22.01",
+        "opportunity_score": 74,
+        "avg_savings_mo": 155,
+        "adoption_pct": 8,
+        "energy_burden_pct": 8.7,
+        "household_count": 1290
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.309,
+              29.578500000000002
+            ],
+            [
+              -82.281,
+              29.578500000000002
+            ],
+            [
+              -82.281,
+              29.6065
+            ],
+            [
+              -82.309,
+              29.6065
+            ],
+            [
+              -82.309,
+              29.578500000000002
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "GEOID": "12001002300",
+        "name": "Tract 23",
+        "opportunity_score": 36,
+        "avg_savings_mo": 80,
+        "adoption_pct": 25,
+        "energy_burden_pct": 4,
+        "household_count": 1050
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.279,
+              29.578500000000002
+            ],
+            [
+              -82.251,
+              29.578500000000002
+            ],
+            [
+              -82.251,
+              29.6065
+            ],
+            [
+              -82.279,
+              29.6065
+            ],
+            [
+              -82.279,
+              29.578500000000002
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
