@@ -217,9 +217,9 @@ const CENSUS_API_KEY = import.meta.env.CENSUS_API_KEY
 const EIA_API_KEY = import.meta.env.EIA_API_KEY
 const NREL_API_KEY = import.meta.env.NREL_API_KEY
 
-const STATE_FIPS_BY_POSTAL = { FL: '12', GA: '13' }
+const STATE_FIPS_BY_POSTAL = { FL: '12', GA: '13', AL: '01' }
 const COVERED_STATES = Object.keys(STATE_FIPS_BY_POSTAL)
-const BASELINE_MONTHLY_KWH = 1150 // typical FL/GA residential usage, incl. AC load
+const BASELINE_MONTHLY_KWH = 1150 // typical FL/GA/AL residential usage, incl. AC load
 const SOLAR_OFFSET_FRACTION = 0.75 // share of the bill a typically-sized rooftop system offsets
 
 // US Census ACS 5-year: median household income (B19013_001E), population (B01003_001E),
