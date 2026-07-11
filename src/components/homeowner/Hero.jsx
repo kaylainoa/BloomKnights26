@@ -120,8 +120,8 @@ export default function Hero({
       </div>
 
       <div
-        className={`relative mx-auto h-full grid grid-cols-1 items-center gap-10 px-6 md:px-12 py-6 max-w-7xl transition-all duration-700 ease-snappy overflow-y-auto ${
-          showResults ? 'lg:grid-cols-[1fr_0.85fr]' : 'md:grid-cols-[1.2fr_1fr]'
+        className={`relative mx-auto h-full grid grid-cols-1 items-center gap-10 px-6 md:px-12 py-6 transition-all duration-700 ease-snappy overflow-y-auto ${
+          showResults ? 'max-w-[100rem] lg:grid-cols-[1fr_620px]' : 'max-w-7xl md:grid-cols-[1.2fr_1fr]'
         }`}
       >
         {/* Text / loading / results column */}

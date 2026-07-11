@@ -414,7 +414,7 @@ export default function ResultsCard({
             />
             <MetricCard
               label="Payback Period"
-              value={`${analysis.paybackYears} yrs`}
+              value={`${analysis.paybackYears?.toFixed(1)} yrs`}
               subtext={`$${analysis.twentyYearSavings?.toLocaleString()} over 20 years`}
             />
           </div>
