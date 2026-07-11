@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
+import stateBoundariesGeojson from '../../data/stateBoundaries.geojson?raw'
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
+const STATE_BOUNDARIES = JSON.parse(stateBoundariesGeojson).features
 
 const RED = '#E24B4A'
 const AMBER = '#EF9F27'
@@ -14,9 +15,16 @@ function scoreColor(score) {
   return SAGE
 }
 
-const VIEW_W = 600
-const VIEW_H = 500
+const VIEW_H = 800
 const PAD = 24
+
+// Only the outer ring of each polygon part — matches the level of detail already used
+// elsewhere here (holes, if any, are ignored).
+function outerRings(geometry) {
+  return geometry.type === 'Polygon'
+    ? [geometry.coordinates[0]]
+    : geometry.coordinates.map((part) => part[0])
+}
 
 function getBounds(features) {
   let minLng = Infinity
@@ -68,30 +76,47 @@ function SvgFallbackMap({ features, selectedTractId, onSelectTract, onHoverTract
 
   const bounds = useMemo(() => getBounds(features), [features])
 
-  const project = useMemo(() => {
+  // Longitude degrees are physically shorter than latitude degrees away from the equator —
+  // without correcting for that, a plain lng/lat -> x/y stretch distorts the state outlines.
+  // viewW is derived from the corrected aspect ratio so the canvas itself matches the true
+  // shape of the data (FL+GA together read tall and narrow, not the old fixed 600x500 box).
+  const { viewW, project } = useMemo(() => {
     const { minLng, maxLng, minLat, maxLat } = bounds
-    const lngRange = maxLng - minLng || 1
+    const midLatRad = ((minLat + maxLat) / 2) * (Math.PI / 180)
+    const lngScale = Math.cos(midLatRad)
+    const lngRange = (maxLng - minLng) * lngScale || 1
     const latRange = maxLat - minLat || 1
-    const innerW = VIEW_W - PAD * 2
-    const innerH = VIEW_H - PAD * 2
 
-    return ([lng, lat]) => {
-      const x = PAD + ((lng - minLng) / lngRange) * innerW
+    const innerH = VIEW_H - PAD * 2
+    const innerW = innerH * (lngRange / latRange)
+    const scale = innerH / latRange
+
+    const projectFn = ([lng, lat]) => {
+      const x = PAD + (lng - minLng) * lngScale * scale
       // flip Y since lat increases northward but SVG y increases downward
-      const y = PAD + innerH - ((lat - minLat) / latRange) * innerH
+      const y = PAD + innerH - (lat - minLat) * scale
       return [x, y]
     }
+
+    return { viewW: Math.round(innerW + PAD * 2), project: projectFn }
   }, [bounds])
 
   const polygons = useMemo(() => {
     return features.map((f) => {
       const geoid = f.properties.GEOID
-      const rings = f.geometry.type === 'Polygon' ? [f.geometry.coordinates[0]] : f.geometry.coordinates.map((p) => p[0])
+      const rings = outerRings(f.geometry)
       const points = rings
         .map((ring) => ring.map((coord) => project(coord).join(',')).join(' '))
       return { geoid, points, feature: f }
     })
   }, [features, project])
+
+  const stateOutlines = useMemo(() => {
+    return STATE_BOUNDARIES.map((f) => ({
+      state: f.properties.state,
+      points: outerRings(f.geometry).map((ring) => ring.map((coord) => project(coord).join(',')).join(' ')),
+    }))
+  }, [project])
 
   const handleMove = (e, feature) => {
     const rect = e.currentTarget.closest('svg').getBoundingClientRect()
@@ -109,10 +134,11 @@ function SvgFallbackMap({ features, selectedTractId, onSelectTract, onHoverTract
   }
 
   return (
-    <div className="relative h-full w-full bg-gray-100">
+    <div className="relative flex h-full w-full items-center justify-center bg-gray-100">
       <svg
-        viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-        className="h-full w-full"
+        viewBox={`0 0 ${viewW} ${VIEW_H}`}
+        className="h-full max-w-full"
+        style={{ aspectRatio: `${viewW} / ${VIEW_H}` }}
         preserveAspectRatio="xMidYMid meet"
       >
         {polygons.map(({ geoid, points, feature }) => {
@@ -131,6 +157,20 @@ function SvgFallbackMap({ features, selectedTractId, onSelectTract, onHoverTract
             />
           ))
         })}
+
+        {stateOutlines.map(({ state, points }) =>
+          points.map((pts, i) => (
+            <polygon
+              key={`${state}-border-${i}`}
+              points={pts}
+              fill="none"
+              stroke="#1f2937"
+              strokeWidth={1.25}
+              strokeLinejoin="round"
+              style={{ pointerEvents: 'none' }}
+            />
+          ))
+        )}
       </svg>
 
       {tooltip && (
@@ -154,141 +194,8 @@ function SvgFallbackMap({ features, selectedTractId, onSelectTract, onHoverTract
   )
 }
 
-function MapboxMap({ features, selectedTractId, onSelectTract, onHoverTract }) {
-  const containerRef = useRef(null)
-  const mapRef = useRef(null)
-  const loadedRef = useRef(false)
-
-  const collection = useMemo(
-    () => ({ type: 'FeatureCollection', features }),
-    [features]
-  )
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function init() {
-      const [{ default: mapboxgl }] = await Promise.all([
-        import('mapbox-gl'),
-        import('mapbox-gl/dist/mapbox-gl.css'),
-      ])
-
-      if (cancelled || !containerRef.current) return
-
-      mapboxgl.accessToken = MAPBOX_TOKEN
-
-      const map = new mapboxgl.Map({
-        container: containerRef.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [-83.5, 29.5],
-        zoom: 5.3,
-      })
-
-      mapRef.current = map
-
-      map.on('load', () => {
-        if (cancelled) return
-
-        map.addSource('tracts', { type: 'geojson', data: collection })
-
-        map.addLayer({
-          id: 'tracts-fill',
-          type: 'fill',
-          source: 'tracts',
-          paint: {
-            'fill-color': [
-              'step',
-              ['get', 'opportunity_score'],
-              SAGE,
-              40,
-              GREEN,
-              60,
-              AMBER,
-              85,
-              RED,
-            ],
-            'fill-opacity': 0.85,
-          },
-        })
-
-        map.addLayer({
-          id: 'tracts-line',
-          type: 'line',
-          source: 'tracts',
-          paint: { 'line-color': '#ffffff', 'line-width': 1.5 },
-        })
-
-        map.addLayer({
-          id: 'tracts-selected',
-          type: 'line',
-          source: 'tracts',
-          paint: { 'line-color': '#111827', 'line-width': 3 },
-          filter: ['==', ['get', 'GEOID'], ''],
-        })
-
-        const bounds = new mapboxgl.LngLatBounds()
-        features.forEach((f) => {
-          const rings =
-            f.geometry.type === 'Polygon' ? [f.geometry.coordinates[0]] : f.geometry.coordinates.map((p) => p[0])
-          rings.forEach((ring) => ring.forEach((coord) => bounds.extend(coord)))
-        })
-        if (!bounds.isEmpty()) {
-          map.fitBounds(bounds, { padding: 40, duration: 0 })
-        }
-
-        map.on('click', 'tracts-fill', (e) => {
-          const geoid = e.features?.[0]?.properties?.GEOID
-          if (geoid) onSelectTract(geoid)
-        })
-
-        map.on('mousemove', 'tracts-fill', (e) => {
-          const geoid = e.features?.[0]?.properties?.GEOID
-          map.getCanvas().style.cursor = 'pointer'
-          onHoverTract?.(geoid ?? null)
-        })
-
-        map.on('mouseleave', 'tracts-fill', () => {
-          map.getCanvas().style.cursor = ''
-          onHoverTract?.(null)
-        })
-
-        loadedRef.current = true
-      })
-    }
-
-    init()
-
-    return () => {
-      cancelled = true
-      loadedRef.current = false
-      mapRef.current?.remove()
-      mapRef.current = null
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // keep source data fresh if features change after load
-  useEffect(() => {
-    const map = mapRef.current
-    if (map && loadedRef.current && map.getSource('tracts')) {
-      map.getSource('tracts').setData(collection)
-    }
-  }, [collection])
-
-  // sync selected highlight
-  useEffect(() => {
-    const map = mapRef.current
-    if (map && loadedRef.current && map.getLayer('tracts-selected')) {
-      map.setFilter('tracts-selected', ['==', ['get', 'GEOID'], selectedTractId ?? ''])
-    }
-  }, [selectedTractId])
-
-  return <div ref={containerRef} className="h-full w-full" />
-}
-
 export default function OpportunityMap({ features, selectedTractId, onSelectTract, onHoverTract }) {
   const safeFeatures = features || []
-  const hasToken = Boolean(MAPBOX_TOKEN)
 
   return (
     <div className="relative h-full min-h-[500px] w-full overflow-hidden rounded-2xl border border-gray-200">
@@ -296,13 +203,6 @@ export default function OpportunityMap({ features, selectedTractId, onSelectTrac
         <div className="flex h-full w-full items-center justify-center bg-gray-50 text-sm text-gray-500">
           Loading map…
         </div>
-      ) : hasToken ? (
-        <MapboxMap
-          features={safeFeatures}
-          selectedTractId={selectedTractId}
-          onSelectTract={onSelectTract}
-          onHoverTract={onHoverTract}
-        />
       ) : (
         <SvgFallbackMap
           features={safeFeatures}
