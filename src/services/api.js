@@ -37,6 +37,47 @@ async function geocodeAddress(address) {
   return { lat: place.location.latitude, lng: place.location.longitude }
 }
 
+// Ray-casting point-in-ring test (even-odd rule) in lng/lat space.
+function pointInRing(lng, lat, ring) {
+  let inside = false
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i]
+    const [xj, yj] = ring[j]
+    const intersects =
+      yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi
+    if (intersects) inside = !inside
+  }
+  return inside
+}
+
+// A GeoJSON polygon's first ring is its outer boundary; the rest are holes.
+function pointInPolygon(lng, lat, polygon) {
+  if (!pointInRing(lng, lat, polygon[0])) return false
+  for (let k = 1; k < polygon.length; k++) {
+    if (pointInRing(lng, lat, polygon[k])) return false
+  }
+  return true
+}
+
+let cachedCounties = null
+function countyFeatures() {
+  if (!cachedCounties) cachedCounties = JSON.parse(countiesGeojson).features
+  return cachedCounties
+}
+
+// Which of the loaded FL/GA/AL counties contains this point, if any. Lets a real
+// geocoded homeowner address be linked back to a county in the opportunity map.
+function countyGeoidForLocation({ lat, lng }) {
+  for (const feature of countyFeatures()) {
+    const { type, coordinates } = feature.geometry
+    const polygons = type === 'Polygon' ? [coordinates] : coordinates
+    for (const polygon of polygons) {
+      if (pointInPolygon(lng, lat, polygon)) return feature.properties.GEOID
+    }
+  }
+  return null
+}
+
 async function fetchBuildingInsights({ lat, lng }) {
   const url = `https://solar.googleapis.com/v1/buildingInsights:findClosest?location.latitude=${lat}&location.longitude=${lng}&key=${GOOGLE_API_KEY}`
   const res = await fetch(url)
@@ -70,7 +111,8 @@ function analysisFromBuildingInsights(insights, address) {
   const twentyYearSavings = cash?.savings?.savingsLifetime?.units
     ? Math.round(Number(cash.savings.savingsLifetime.units))
     : monthlySavings * 12 * 20
-  const paybackYears = cash?.paybackYears ?? Math.round((systemCostAfterCredit / (monthlySavings * 12)) * 10) / 10
+  const rawPaybackYears = cash?.paybackYears ?? systemCostAfterCredit / (monthlySavings * 12)
+  const paybackYears = Math.round(rawPaybackYears * 100) / 100
 
   const sunshineHours = potential.maxSunshineHoursPerYear || 0
   const roofSuitability = sunshineHours > 1400 ? 'excellent' : sunshineHours > 900 ? 'good' : 'poor'
@@ -123,7 +165,10 @@ export async function getPropertyAnalysis(address) {
     try {
       const location = await geocodeAddress(address)
       const insights = await fetchBuildingInsights(location)
-      return analysisFromBuildingInsights(insights, address)
+      return {
+        ...analysisFromBuildingInsights(insights, address),
+        countyGeoid: countyGeoidForLocation(location),
+      }
     } catch (err) {
       console.warn('[SolarScope] Google Solar API unavailable, using mock data:', err.message)
     }

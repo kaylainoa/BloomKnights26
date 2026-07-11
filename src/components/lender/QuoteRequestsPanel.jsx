@@ -8,10 +8,12 @@ import { CheckCircle2, Inbox } from 'lucide-react'
  * homeowner sees the approval on their own tab.
  *
  * Props:
- *  - requests: array of { id, name, email, address, installer, amount, status, decision }
+ *  - requests: array of { id, name, email, address, installer, amount, status, decision, geoid }
  *  - onRefer(request): kick off the OneEthos referral for a request.
+ *  - selectedGeoid: GEOID of the currently-focused county, for highlighting the matching request.
+ *  - onSelectRequest(request): focus the request's county in the Top Opportunity Counties sidebar.
  */
-export default function QuoteRequestsPanel({ requests, onRefer }) {
+export default function QuoteRequestsPanel({ requests, onRefer, selectedGeoid, onSelectRequest }) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5">
       <div className="flex items-center gap-2">
@@ -34,10 +36,32 @@ export default function QuoteRequestsPanel({ requests, onRefer }) {
         </div>
       ) : (
         <div className="mt-4 space-y-3">
-          {requests.map((r) => (
+          {requests.map((r) => {
+            const isSelected = r.geoid && r.geoid === selectedGeoid
+            const clickable = Boolean(r.geoid && onSelectRequest)
+            return (
             <div
               key={r.id}
-              className="flex flex-col gap-3 rounded-xl border border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between"
+              role={clickable ? 'button' : undefined}
+              tabIndex={clickable ? 0 : undefined}
+              onClick={clickable ? () => onSelectRequest(r) : undefined}
+              onKeyDown={
+                clickable
+                  ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        onSelectRequest(r)
+                      }
+                    }
+                  : undefined
+              }
+              className={`flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
+                clickable ? 'cursor-pointer transition' : ''
+              } ${
+                isSelected
+                  ? 'border-2 border-blue-600 bg-blue-50'
+                  : `border-gray-200 ${clickable ? 'hover:border-gray-300' : ''}`
+              }`}
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -63,7 +87,10 @@ export default function QuoteRequestsPanel({ requests, onRefer }) {
                 ) : (
                   <button
                     type="button"
-                    onClick={() => onRefer(r)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onRefer(r)
+                    }}
                     className="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 sm:w-auto"
                   >
                     Refer to OneEthos financing
@@ -71,7 +98,8 @@ export default function QuoteRequestsPanel({ requests, onRefer }) {
                 )}
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

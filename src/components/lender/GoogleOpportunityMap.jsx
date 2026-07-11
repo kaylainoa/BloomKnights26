@@ -45,7 +45,7 @@ function getBounds(features) {
  * near a given county) instead of shapes floating on a blank background.
  * Props: same as OpportunityMap.jsx — features, selectedTractId, onSelectTract, onHoverTract.
  */
-export default function GoogleOpportunityMap({ features, selectedTractId, onSelectTract, onHoverTract }) {
+export default function GoogleOpportunityMap({ features, selectedTractId, onSelectTract, onHoverTract, focusGeoid, focusNonce }) {
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const dataLayerRef = useRef(null)
@@ -135,6 +135,23 @@ export default function GoogleOpportunityMap({ features, selectedTractId, onSele
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, features])
+
+  // Zoom the map into a specific county when asked (e.g. a homeowner request was clicked).
+  // Keyed on focusNonce so clicking the same county again re-zooms; plain map clicks don't
+  // bump the nonce, so they only highlight without moving the viewport.
+  useEffect(() => {
+    const map = mapRef.current
+    if (status !== 'ready' || !map || !focusGeoid) return
+    const feature = features.find((f) => f.properties.GEOID === focusGeoid)
+    if (!feature) return
+    const maps = window.google.maps
+    const { minLng, maxLng, minLat, maxLat } = getBounds([feature])
+    map.fitBounds(
+      new maps.LatLngBounds({ lat: minLat, lng: minLng }, { lat: maxLat, lng: maxLng }),
+      48
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusNonce, status])
 
   // Re-style on selection change (cheap — no re-add of the layer).
   useEffect(() => {
