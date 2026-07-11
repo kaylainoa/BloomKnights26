@@ -15,15 +15,15 @@ import ResultsCard from './ResultsCard'
  *  - mode: 'search' | 'loading' | 'results'
  *  - onSelectAddress(address: string): forwarded to AddressSearch.
  *  - pendingAddress: address text shown by LoadingScreen while mode === 'loading'.
- *  - analysis, onOpenReferral, onAskQuestion: forwarded to ResultsCard while mode === 'results'.
+ *  - analysis, onRequestQuote, requests: forwarded to ResultsCard while mode === 'results'.
  */
 export default function Hero({
   mode,
   onSelectAddress,
   pendingAddress,
   analysis,
-  onOpenReferral,
-  onAskQuestion,
+  onRequestQuote,
+  requests,
 }) {
   const [mapTarget, setMapTarget] = useState(null)
   const [mapLabel, setMapLabel] = useState(null)
@@ -107,8 +107,8 @@ export default function Hero({
               <ResultsCard
                 analysis={analysis}
                 loading={false}
-                onOpenReferral={onOpenReferral}
-                onAskQuestion={onAskQuestion}
+                onRequestQuote={onRequestQuote}
+                requests={requests}
               />
             </div>
           )}

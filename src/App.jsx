@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import ReferralModal from './components/ReferralModal'
-import ReferralLoadingScreen from './components/ReferralLoadingScreen'
 import Hero from './components/homeowner/Hero'
 import OpportunityMap from './components/lender/OpportunityMap'
 import TractSidebar from './components/lender/TractSidebar'
+import QuoteRequestsPanel from './components/lender/QuoteRequestsPanel'
 import { getPropertyAnalysis, getTractScores, generateSummary, referToLender } from './services/api'
 
 export default function App() {
@@ -22,7 +22,9 @@ export default function App() {
 
   // Shared referral modal state
   const [referral, setReferral] = useState({ open: false, target: null, decision: null })
-  const [referralLoading, setReferralLoading] = useState(false)
+
+  // Quote requests submitted by homeowners, surfaced to the lender for OneEthos referral.
+  const [quoteRequests, setQuoteRequests] = useState([])
 
   useEffect(() => {
     getTractScores().then((fc) => {
@@ -43,19 +45,46 @@ export default function App() {
 
   async function openReferral(target, amount) {
     setReferral({ open: false, target, decision: null })
-    setReferralLoading(true)
-
-    try {
-      const res = await referToLender(target, { amount })
-      setReferral({ open: true, target, decision: res })
-    } finally {
-      setReferralLoading(false)
-    }
+    const res = await referToLender(target, { amount })
+    setReferral({ open: true, target, decision: res })
   }
 
   function closeReferral() {
     setReferral({ open: false, target: null, decision: null })
   }
+
+  // Homeowner submitted an installer quote request — record it so it shows on the Lender tab.
+  function handleRequestQuote({ installer, name, email }) {
+    const id = `QR-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+    setQuoteRequests((prev) => [
+      {
+        id,
+        installer,
+        name,
+        email,
+        address: analysis?.address,
+        amount: analysis?.systemCostAfterCredit,
+        status: 'pending',
+        decision: null,
+      },
+      ...prev,
+    ])
+  }
+
+  // Lender refers a homeowner's quote request to OneEthos; on approval the homeowner's
+  // tab reflects the decision (matched by request id).
+  async function handleReferQuoteRequest(request) {
+    const res = await referToLender(request.address, { amount: request.amount })
+    setQuoteRequests((prev) =>
+      prev.map((r) =>
+        r.id === request.id ? { ...r, status: 'approved', decision: res } : r
+      )
+    )
+  }
+
+  const requestsForCurrentAddress = quoteRequests.filter(
+    (r) => r.address && r.address === analysis?.address
+  )
 
   function goHome() {
     setView('homeowner')
@@ -73,8 +102,8 @@ export default function App() {
           onSelectAddress={handleSelectAddress}
           pendingAddress={pendingAddress}
           analysis={analysis}
-          onOpenReferral={() => openReferral(analysis?.address, analysis?.systemCostAfterCredit)}
-          onAskQuestion={() => console.log('Ask a question stub')}
+          onRequestQuote={handleRequestQuote}
+          requests={requestsForCurrentAddress}
         />
       </div>
 
@@ -91,6 +120,11 @@ export default function App() {
                 Florida and Georgia counties ranked by clean energy financing opportunity.
               </p>
             </div>
+
+            <QuoteRequestsPanel
+              requests={quoteRequests}
+              onRefer={handleReferQuoteRequest}
+            />
 
             <div className="flex flex-col gap-6 md:h-[880px] md:flex-row">
               <div className="flex min-h-0 flex-col gap-3 md:w-[60%]">
@@ -126,7 +160,6 @@ export default function App() {
           </div>
       </main>
 
-      {referralLoading && <ReferralLoadingScreen target={referral.target} />}
       <ReferralModal
         open={referral.open}
         onClose={closeReferral}
