@@ -583,6 +583,75 @@ export async function generateSummary(analysis) {
   return analysis.aiSummary
 }
 
+const CHAT_FALLBACK_REPLY =
+  "I'm having trouble connecting right now. In the meantime, feel free to ask a local installer directly, or try me again in a moment."
+
+// Grounds the chatbot in the homeowner's actual numbers when they have a live analysis, so
+// answers like "why is my payback so long" can reference their real system size/cost/savings
+// instead of speaking in generalities.
+function buildChatSystemInstruction(analysis) {
+  let instruction =
+    "You are SolarScope's friendly solar energy advisor, answering a homeowner's questions in a chat widget. " +
+    'Keep answers short (2-4 sentences), plain-English, no markdown, no headers, no bullet points. ' +
+    "If you don't know something specific to their situation, say so rather than guessing."
+
+  if (analysis?.type === 'solar') {
+    instruction +=
+      ` This homeowner's own results, for reference: address ${analysis.address}, ` +
+      `${analysis.systemSizeKw}kW system, $${analysis.systemCostAfterCredit} after the federal tax credit, ` +
+      `$${analysis.monthlySavings}/mo savings, ${analysis.paybackYears}-year payback, ` +
+      `$${analysis.twentyYearSavings} saved over 20 years, roof suitability: ${analysis.roofSuitability}. ` +
+      'Reference these numbers when the question is about their own project.'
+  } else if (analysis?.type === 'alternative') {
+    instruction +=
+      ` This homeowner isn't a fit for rooftop solar (reason: ${analysis.reason === 'renter' ? 'renting' : 'poor roof sun exposure'}), ` +
+      `but was shown community solar savings of about $${analysis.communitySolarSavingsMo}/mo. ` +
+      'Reference this when relevant.'
+  }
+
+  return instruction
+}
+
+/**
+ * askChatQuestion(messages, analysis)
+ * ------------------------------------
+ * REAL API: Google Gemini API — generateContent, same endpoint as generateSummary but with
+ *   a `systemInstruction` (persona + the homeowner's own analysis numbers when available) and
+ *   the full running conversation passed as `contents` for multi-turn context.
+ *   POST https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent
+ *       ?key={API_KEY}
+ * `messages` is [{ role: 'user' | 'model', text }], oldest first — matches Gemini's own role
+ *   values so it maps directly into `contents` with no translation.
+ * Falls back to a friendly canned reply if Gemini fails or no key is configured, so the widget
+ * never shows a broken/empty response.
+ */
+export async function askChatQuestion(messages, analysis) {
+  if (GEMINI_API_KEY) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: buildChatSystemInstruction(analysis) }] },
+            contents: messages.map((m) => ({ role: m.role, parts: [{ text: m.text }] })),
+          }),
+        }
+      )
+      if (!res.ok) throw new Error(`Gemini API ${res.status}`)
+      const data = await res.json()
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+      if (text) return text
+    } catch (err) {
+      console.warn('[SolarScope] Gemini chat unavailable:', err.message)
+    }
+  }
+
+  await delay(400)
+  return CHAT_FALLBACK_REPLY
+}
+
 // OneEthos solar-loan terms used to fake an instant financing decision.
 const ONEETHOS_APR = 0.0699 // 6.99% fixed
 const ONEETHOS_TERM_MONTHS = 240 // 20-year solar loan

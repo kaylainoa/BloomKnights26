@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import ReferralModal from './components/ReferralModal'
 import Hero from './components/homeowner/Hero'
+import ChatWidget from './components/homeowner/ChatWidget'
 import OpportunityMap from './components/lender/OpportunityMap'
 import TractSidebar from './components/lender/TractSidebar'
 import QuoteRequestsPanel from './components/lender/QuoteRequestsPanel'
@@ -117,6 +118,7 @@ export default function App() {
           onRequestQuote={handleRequestQuote}
           requests={requestsForCurrentAddress}
         />
+        <ChatWidget analysis={analysis} />
       </div>
 
       {/* Always mounted (just hidden) once first shown — GoogleOpportunityMap manages DOM
