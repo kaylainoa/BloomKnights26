@@ -217,9 +217,9 @@ const CENSUS_API_KEY = import.meta.env.CENSUS_API_KEY
 const EIA_API_KEY = import.meta.env.EIA_API_KEY
 const NREL_API_KEY = import.meta.env.NREL_API_KEY
 
-const STATE_FIPS_BY_POSTAL = { FL: '12', GA: '13', AL: '01' }
+const STATE_FIPS_BY_POSTAL = { FL: '12', GA: '13', AL: '01', MS: '28', TN: '47', NC: '37', SC: '45' }
 const COVERED_STATES = Object.keys(STATE_FIPS_BY_POSTAL)
-const BASELINE_MONTHLY_KWH = 1150 // typical FL/GA/AL residential usage, incl. AC load
+const BASELINE_MONTHLY_KWH = 1150 // typical Southeast US residential usage, incl. AC load
 const SOLAR_OFFSET_FRACTION = 0.75 // share of the bill a typically-sized rooftop system offsets
 
 // US Census ACS 5-year: median household income (B19013_001E), population (B01003_001E),
@@ -267,11 +267,11 @@ async function fetchCountySolarResource(lat, lng) {
 }
 
 // Annual GHI genuinely declines with latitude across this footprint — the FL peninsula/Keys
-// (~24.5°N) run noticeably sunnier than north Georgia (~35°N). Used whenever NREL is
-// unreachable, so savings still reflects the real geographic solar gradient instead of
-// collapsing to one flat figure.
+// (~24.5°N) run noticeably sunnier than the NC/TN mountains near the VA border (~36.7°N). Used
+// whenever NREL is unreachable, so savings still reflects the real geographic solar gradient
+// instead of collapsing to one flat figure.
 function estimateGhiFromLatitude(lat) {
-  return Math.max(4.5, Math.min(5.6, 5.6 - (lat - 24.5) * 0.105))
+  return Math.max(4.2, Math.min(5.6, 5.6 - (lat - 24.5) * 0.105))
 }
 
 function countyCentroid(feature) {
@@ -336,7 +336,7 @@ function buildCountyFeature(feature, { census, ratePerKwh, ghi, avgGhi }) {
   const adoptionPct = estimateAdoptionPct({ medianIncome, population, landAreaSqmi })
 
   // Ranking key only — score.js's absolute SAVINGS_MAX/ADOPTION_MAX/BURDEN_MAX constants were
-  // calibrated against the old single-county mock data. Real FL/GA county figures have much
+  // calibrated against the old single-county mock data. Real Southeast US county figures have much
   // tighter variance (savings/burden never approach those ceilings), so this raw value is used
   // purely to sort counties relative to each other; see rankCountiesByOpportunity below for the
   // displayed opportunity_score.
@@ -361,7 +361,7 @@ function buildCountyFeature(feature, { census, ratePerKwh, ghi, avgGhi }) {
 }
 
 // Displays each county's opportunity as a percentile rank among the currently-loaded set rather
-// than an absolute score against a fixed ceiling — real FL/GA inputs are too tightly clustered
+// than an absolute score against a fixed ceiling — real Southeast US inputs are too tightly clustered
 // for the fixed thresholds to ever produce the full red/amber/green/sage spread otherwise (every
 // county landed in one middle band). Percentile rank guarantees the color scale is always used
 // meaningfully, and matches what a lender actually wants: which counties are the best relative
@@ -384,14 +384,14 @@ function rankCountiesByOpportunity(features) {
 /**
  * getTractScores()
  * ----------------
- * REAL API: US Census ACS (median household income, population, households) for every FL and GA
- *   county (one call per state), EIA API v2 for each state's current residential electricity
- *   rate, and NREL Solar Resource Data per county centroid for solar production variance across
- *   both states. Adoption is a modeled heuristic (see estimateAdoptionPct) since no free live API
- *   publishes per-county solar adoption. Each county's inputs feed utils/score.js
- *   computeOpportunityScore() as a ranking key, then rankCountiesByOpportunity() converts that
- *   into a percentile-rank opportunity_score (see its comment for why) to produce a GeoJSON
- *   FeatureCollection covering all of Florida and Georgia (COVERED_STATES).
+ * REAL API: US Census ACS (median household income, population, households) for every county in
+ *   FL, GA, AL, MS, TN, NC, and SC (one call per state), EIA API v2 for each state's current
+ *   residential electricity rate, and NREL Solar Resource Data per county centroid for solar
+ *   production variance across all seven states. Adoption is a modeled heuristic (see
+ *   estimateAdoptionPct) since no free live API publishes per-county solar adoption. Each
+ *   county's inputs feed utils/score.js computeOpportunityScore() as a ranking key, then
+ *   rankCountiesByOpportunity() converts that into a percentile-rank opportunity_score (see its
+ *   comment for why) to produce a GeoJSON FeatureCollection covering all of COVERED_STATES.
  * NOTE: the Census data API does not send CORS headers, so it cannot be called directly from a
  *   browser regardless of key validity — that source always falls back to the real static
  *   snapshot in data/countyCensusStats.json (see staticCensusStats) unless a server-side proxy
