@@ -1,7 +1,11 @@
 import { X, CheckCircle2 } from 'lucide-react'
 
-export default function ReferralModal({ open, onClose, referralId, target }) {
+export default function ReferralModal({ open, onClose, target, decision }) {
   if (!open) return null
+
+  const approved = decision?.decision === 'approved'
+  const aprPct = decision?.apr != null ? (decision.apr * 100).toFixed(2) : null
+  const termYears = decision?.termMonths ? Math.round(decision.termMonths / 12) : null
 
   return (
     <div
@@ -25,9 +29,17 @@ export default function ReferralModal({ open, onClose, referralId, target }) {
           </button>
         </div>
 
-        <h3 className="mt-4 text-xl font-semibold text-gray-900">Referral sent</h3>
+        <h3 className="mt-4 text-xl font-semibold text-gray-900">
+          {approved ? "You're approved!" : 'Referral sent'}
+        </h3>
         <p className="mt-2 text-gray-600">
-          {target ? (
+          {approved ? (
+            <>
+              <span className="text-gray-900">OneEthos</span> approved{' '}
+              {target ? <span className="text-gray-900">{target}</span> : 'this project'}{' '}
+              for solar financing.
+            </>
+          ) : target ? (
             <>
               We&apos;ve referred <span className="text-gray-900">{target}</span> to{' '}
               <span className="text-gray-900">OneEthos</span> for financing review.
@@ -37,9 +49,41 @@ export default function ReferralModal({ open, onClose, referralId, target }) {
           )}
         </p>
 
-        {referralId && (
+        {approved && (
+          <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 p-5">
+            <p className="text-[13px] uppercase tracking-wide text-green-700">
+              Estimated monthly payment
+            </p>
+            <p className="mt-1 text-4xl font-semibold text-green-900">
+              ${decision.monthlyPayment?.toLocaleString()}
+              <span className="text-lg font-normal text-green-700">/mo</span>
+            </p>
+            <dl className="mt-4 space-y-1.5 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-green-700">Approved amount</dt>
+                <dd className="text-green-900">
+                  ${decision.approvedAmount?.toLocaleString()}
+                </dd>
+              </div>
+              {aprPct && (
+                <div className="flex justify-between">
+                  <dt className="text-green-700">Rate (APR)</dt>
+                  <dd className="text-green-900">{aprPct}%</dd>
+                </div>
+              )}
+              {termYears && (
+                <div className="flex justify-between">
+                  <dt className="text-green-700">Term</dt>
+                  <dd className="text-green-900">{termYears} years</dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        )}
+
+        {decision?.referralId && (
           <p className="mt-4 text-xs text-gray-500">
-            Reference ID <span className="text-gray-900">{referralId}</span>
+            Reference ID <span className="text-gray-900">{decision.referralId}</span>
           </p>
         )}
 
