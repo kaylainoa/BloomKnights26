@@ -84,17 +84,30 @@ export default function App() {
                 Lending opportunity map
               </h1>
               <p className="text-gray-600">
-                Florida counties ranked by clean energy financing opportunity, statewide.
+                Florida and Georgia counties ranked by clean energy financing opportunity.
               </p>
             </div>
 
             <div className="flex flex-col gap-6 md:h-[720px] md:flex-row">
-              <div className="md:w-[60%]">
-                <OpportunityMap
-                  features={tractFeatures}
-                  selectedTractId={selectedTractId}
-                  onSelectTract={setSelectedTractId}
-                />
+              <div className="flex min-h-0 flex-col gap-3 md:w-[60%]">
+                <div className="min-h-0 flex-1">
+                  <OpportunityMap
+                    features={tractFeatures}
+                    selectedTractId={selectedTractId}
+                    onSelectTract={setSelectedTractId}
+                  />
+                </div>
+                <p className="shrink-0 text-xs leading-relaxed text-gray-500">
+                  <span className="font-medium text-gray-700">How this is scored: </span>
+                  Each county gets a percentile rank (0–100) relative to the others shown here,
+                  based on estimated solar savings, energy burden (electricity cost as a share of
+                  income), and solar adoption. <span className="font-medium text-gray-700">Adoption</span> is
+                  an estimate of how many households likely already have solar — modeled from
+                  income and population density, since no public dataset tracks this directly.
+                  Counties with high savings potential, high burden, and low adoption rank highest
+                  (red, underserved); counties where solar has already taken hold rank lowest
+                  (green, already served).
+                </p>
               </div>
               <div className="min-h-0 md:w-[40%]">
                 <TractSidebar

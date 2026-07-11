@@ -180,8 +180,8 @@ function MapboxMap({ features, selectedTractId, onSelectTract, onHoverTract }) {
       const map = new mapboxgl.Map({
         container: containerRef.current,
         style: 'mapbox://styles/mapbox/light-v11',
-        center: [-83.5, 27.8],
-        zoom: 5.7,
+        center: [-83.5, 29.5],
+        zoom: 5.3,
       })
 
       mapRef.current = map

@@ -1,0 +1,1132 @@
+{
+"12001": {
+"medianIncome": 58783,
+"population": 285994,
+"households": 114398
+},
+"12003": {
+"medianIncome": 67375,
+"population": 28368,
+"households": 11347
+},
+"12005": {
+"medianIncome": 65521,
+"population": 190769,
+"households": 76308
+},
+"12007": {
+"medianIncome": 57664,
+"population": 27858,
+"households": 11143
+},
+"12009": {
+"medianIncome": 74899,
+"population": 643979,
+"households": 257592
+},
+"12011": {
+"medianIncome": 70834,
+"population": 1962531,
+"households": 785012
+},
+"12013": {
+"medianIncome": 46766,
+"population": 13470,
+"households": 5388
+},
+"12015": {
+"medianIncome": 65040,
+"population": 206134,
+"households": 82454
+},
+"12017": {
+"medianIncome": 52534,
+"population": 166696,
+"households": 66678
+},
+"12019": {
+"medianIncome": 84364,
+"population": 232439,
+"households": 92976
+},
+"12021": {
+"medianIncome": 81821,
+"population": 404310,
+"households": 161724
+},
+"12023": {
+"medianIncome": 54060,
+"population": 73063,
+"households": 29225
+},
+"12027": {
+"medianIncome": 47097,
+"population": 35979,
+"households": 14392
+},
+"12029": {
+"medianIncome": 40587,
+"population": 17465,
+"households": 6986
+},
+"12031": {
+"medianIncome": 70203,
+"population": 1030822,
+"households": 412329
+},
+"12033": {
+"medianIncome": 61634,
+"population": 326928,
+"households": 130771
+},
+"12035": {
+"medianIncome": 73336,
+"population": 131439,
+"households": 52576
+},
+"12037": {
+"medianIncome": 52180,
+"population": 12594,
+"households": 5038
+},
+"12039": {
+"medianIncome": 45628,
+"population": 43833,
+"households": 17533
+},
+"12041": {
+"medianIncome": 58178,
+"population": 19587,
+"households": 7835
+},
+"12043": {
+"medianIncome": 50559,
+"population": 12786,
+"households": 5114
+},
+"12045": {
+"medianIncome": 55909,
+"population": 15693,
+"households": 6277
+},
+"12047": {
+"medianIncome": 45484,
+"population": 13471,
+"households": 5388
+},
+"12049": {
+"medianIncome": 48572,
+"population": 25760,
+"households": 10304
+},
+"12051": {
+"medianIncome": 55308,
+"population": 43333,
+"households": 17333
+},
+"12053": {
+"medianIncome": 60582,
+"population": 212807,
+"households": 85123
+},
+"12055": {
+"medianIncome": 51954,
+"population": 107614,
+"households": 43046
+},
+"12057": {
+"medianIncome": 74091,
+"population": 1535564,
+"households": 614226
+},
+"12059": {
+"medianIncome": 50118,
+"population": 19944,
+"households": 7978
+},
+"12061": {
+"medianIncome": 69462,
+"population": 169795,
+"households": 67918
+},
+"12063": {
+"medianIncome": 50625,
+"population": 48622,
+"households": 19449
+},
+"12065": {
+"medianIncome": 56900,
+"population": 15450,
+"households": 6180
+},
+"12067": {
+"medianIncome": 50775,
+"population": 8078,
+"households": 3231
+},
+"12069": {
+"medianIncome": 67637,
+"population": 424462,
+"households": 169785
+},
+"12071": {
+"medianIncome": 71607,
+"population": 834573,
+"households": 333829
+},
+"12073": {
+"medianIncome": 61560,
+"population": 296913,
+"households": 118765
+},
+"12075": {
+"medianIncome": 55147,
+"population": 46545,
+"households": 18618
+},
+"12077": {
+"medianIncome": 49514,
+"population": 7706,
+"households": 3082
+},
+"12079": {
+"medianIncome": 46141,
+"population": 18519,
+"households": 7408
+},
+"12081": {
+"medianIncome": 72176,
+"population": 441095,
+"households": 176438
+},
+"12083": {
+"medianIncome": 54517,
+"population": 409959,
+"households": 163984
+},
+"12085": {
+"medianIncome": 80678,
+"population": 163315,
+"households": 65326
+},
+"12086": {
+"medianIncome": 66952,
+"population": 2686867,
+"households": 1074747
+},
+"12087": {
+"medianIncome": 79459,
+"population": 80614,
+"households": 32246
+},
+"12089": {
+"medianIncome": 90808,
+"population": 101501,
+"households": 40600
+},
+"12091": {
+"medianIncome": 76663,
+"population": 218464,
+"households": 87386
+},
+"12093": {
+"medianIncome": 50176,
+"population": 41427,
+"households": 16571
+},
+"12095": {
+"medianIncome": 72129,
+"population": 1471416,
+"households": 588566
+},
+"12097": {
+"medianIncome": 63782,
+"population": 437784,
+"households": 175114
+},
+"12099": {
+"medianIncome": 76713,
+"population": 1533801,
+"households": 613520
+},
+"12101": {
+"medianIncome": 65933,
+"population": 632996,
+"households": 253198
+},
+"12103": {
+"medianIncome": 66427,
+"population": 961596,
+"households": 384638
+},
+"12105": {
+"medianIncome": 61941,
+"population": 818330,
+"households": 327332
+},
+"12107": {
+"medianIncome": 46459,
+"population": 75955,
+"households": 30382
+},
+"12109": {
+"medianIncome": 103757,
+"population": 320110,
+"households": 128044
+},
+"12111": {
+"medianIncome": 64038,
+"population": 373586,
+"households": 149434
+},
+"12113": {
+"medianIncome": 82537,
+"population": 203162,
+"households": 81265
+},
+"12115": {
+"medianIncome": 78309,
+"population": 469013,
+"households": 187605
+},
+"12117": {
+"medianIncome": 80296,
+"population": 484271,
+"households": 193708
+},
+"12119": {
+"medianIncome": 77851,
+"population": 151565,
+"households": 60626
+},
+"12121": {
+"medianIncome": 51295,
+"population": 46130,
+"households": 18452
+},
+"12123": {
+"medianIncome": 48482,
+"population": 21582,
+"households": 8633
+},
+"12125": {
+"medianIncome": 60749,
+"population": 15532,
+"households": 6213
+},
+"12127": {
+"medianIncome": 64601,
+"population": 590357,
+"households": 236143
+},
+"12129": {
+"medianIncome": 63482,
+"population": 36449,
+"households": 14580
+},
+"12131": {
+"medianIncome": 78814,
+"population": 86354,
+"households": 34542
+},
+"12133": {
+"medianIncome": 49233,
+"population": 25602,
+"households": 10241
+},
+"13001": {
+"medianIncome": 51217,
+"population": 18457,
+"households": 7383
+},
+"13003": {
+"medianIncome": 46060,
+"population": 8293,
+"households": 3317
+},
+"13005": {
+"medianIncome": 46044,
+"population": 11124,
+"households": 4450
+},
+"13007": {
+"medianIncome": 50129,
+"population": 2743,
+"households": 1097
+},
+"13009": {
+"medianIncome": 49883,
+"population": 43396,
+"households": 17358
+},
+"13011": {
+"medianIncome": 66928,
+"population": 19789,
+"households": 7916
+},
+"13013": {
+"medianIncome": 77583,
+"population": 92792,
+"households": 37117
+},
+"13015": {
+"medianIncome": 80017,
+"population": 115041,
+"households": 46016
+},
+"13017": {
+"medianIncome": 41141,
+"population": 17128,
+"households": 6851
+},
+"13019": {
+"medianIncome": 48725,
+"population": 18570,
+"households": 7428
+},
+"13021": {
+"medianIncome": 48539,
+"population": 156512,
+"households": 62605
+},
+"13023": {
+"medianIncome": 56070,
+"population": 12465,
+"households": 4986
+},
+"13025": {
+"medianIncome": 50370,
+"population": 18401,
+"households": 7360
+},
+"13027": {
+"medianIncome": 43353,
+"population": 16245,
+"households": 6498
+},
+"13029": {
+"medianIncome": 93057,
+"population": 49739,
+"households": 19896
+},
+"13031": {
+"medianIncome": 49471,
+"population": 84327,
+"households": 33731
+},
+"13033": {
+"medianIncome": 49431,
+"population": 24438,
+"households": 9775
+},
+"13035": {
+"medianIncome": 62231,
+"population": 26887,
+"households": 10755
+},
+"13037": {
+"medianIncome": 39681,
+"population": 5457,
+"households": 2183
+},
+"13039": {
+"medianIncome": 67628,
+"population": 58118,
+"households": 23247
+},
+"13043": {
+"medianIncome": 44493,
+"population": 11059,
+"households": 4424
+},
+"13045": {
+"medianIncome": 69924,
+"population": 127098,
+"households": 50839
+},
+"13047": {
+"medianIncome": 66918,
+"population": 68910,
+"households": 27564
+},
+"13049": {
+"medianIncome": 48147,
+"population": 12934,
+"households": 5174
+},
+"13051": {
+"medianIncome": 64029,
+"population": 303655,
+"households": 121462
+},
+"13053": {
+"medianIncome": 57507,
+"population": 8661,
+"households": 3464
+},
+"13055": {
+"medianIncome": 50714,
+"population": 25222,
+"households": 10089
+},
+"13057": {
+"medianIncome": 99932,
+"population": 286602,
+"households": 114641
+},
+"13059": {
+"medianIncome": 49832,
+"population": 129933,
+"households": 51973
+},
+"13061": {
+"medianIncome": 37961,
+"population": 2853,
+"households": 1141
+},
+"13063": {
+"medianIncome": 57625,
+"population": 298300,
+"households": 119320
+},
+"13065": {
+"medianIncome": 45595,
+"population": 6746,
+"households": 2698
+},
+"13067": {
+"medianIncome": 96798,
+"population": 776743,
+"households": 310697
+},
+"13069": {
+"medianIncome": 48792,
+"population": 43317,
+"households": 17327
+},
+"13071": {
+"medianIncome": 49214,
+"population": 46167,
+"households": 18467
+},
+"13073": {
+"medianIncome": 94224,
+"population": 165162,
+"households": 66065
+},
+"13075": {
+"medianIncome": 44476,
+"population": 17714,
+"households": 7086
+},
+"13077": {
+"medianIncome": 87618,
+"population": 155892,
+"households": 62357
+},
+"13079": {
+"medianIncome": 60295,
+"population": 12277,
+"households": 4911
+},
+"13081": {
+"medianIncome": 43884,
+"population": 19631,
+"households": 7852
+},
+"13083": {
+"medianIncome": 59708,
+"population": 16165,
+"households": 6466
+},
+"13085": {
+"medianIncome": 84551,
+"population": 31732,
+"households": 12693
+},
+"13087": {
+"medianIncome": 46455,
+"population": 29087,
+"households": 11635
+},
+"13089": {
+"medianIncome": 76736,
+"population": 762992,
+"households": 305197
+},
+"13091": {
+"medianIncome": 43783,
+"population": 19776,
+"households": 7910
+},
+"13093": {
+"medianIncome": 46191,
+"population": 10981,
+"households": 4392
+},
+"13095": {
+"medianIncome": 42629,
+"population": 82645,
+"households": 33058
+},
+"13097": {
+"medianIncome": 79242,
+"population": 149160,
+"households": 59664
+},
+"13099": {
+"medianIncome": 43417,
+"population": 10563,
+"households": 4225
+},
+"13101": {
+"medianIncome": 47195,
+"population": 3709,
+"households": 1484
+},
+"13103": {
+"medianIncome": 88111,
+"population": 71541,
+"households": 28616
+},
+"13105": {
+"medianIncome": 49220,
+"population": 20013,
+"households": 8005
+},
+"13107": {
+"medianIncome": 46975,
+"population": 23119,
+"households": 9248
+},
+"13109": {
+"medianIncome": 45163,
+"population": 10754,
+"households": 4302
+},
+"13111": {
+"medianIncome": 60604,
+"population": 25955,
+"households": 10382
+},
+"13113": {
+"medianIncome": 109358,
+"population": 123351,
+"households": 49340
+},
+"13115": {
+"medianIncome": 56651,
+"population": 100113,
+"households": 40045
+},
+"13117": {
+"medianIncome": 130909,
+"population": 272887,
+"households": 109155
+},
+"13119": {
+"medianIncome": 49940,
+"population": 24782,
+"households": 9913
+},
+"13121": {
+"medianIncome": 89798,
+"population": 1079105,
+"households": 431642
+},
+"13123": {
+"medianIncome": 68294,
+"population": 32860,
+"households": 13144
+},
+"13125": {
+"medianIncome": 55539,
+"population": 2954,
+"households": 1182
+},
+"13127": {
+"medianIncome": 63532,
+"population": 86172,
+"households": 34469
+},
+"13129": {
+"medianIncome": 63946,
+"population": 59757,
+"households": 23903
+},
+"13131": {
+"medianIncome": 48548,
+"population": 26066,
+"households": 10426
+},
+"13133": {
+"medianIncome": 74488,
+"population": 20722,
+"households": 8289
+},
+"13135": {
+"medianIncome": 83918,
+"population": 983526,
+"households": 393410
+},
+"13137": {
+"medianIncome": 62428,
+"population": 48757,
+"households": 19503
+},
+"13139": {
+"medianIncome": 76789,
+"population": 217267,
+"households": 86907
+},
+"13141": {
+"medianIncome": 38570,
+"population": 8676,
+"households": 3470
+},
+"13143": {
+"medianIncome": 57912,
+"population": 32038,
+"households": 12815
+},
+"13145": {
+"medianIncome": 90636,
+"population": 36654,
+"households": 14662
+},
+"13147": {
+"medianIncome": 56137,
+"population": 27556,
+"households": 11022
+},
+"13149": {
+"medianIncome": 56724,
+"population": 12034,
+"households": 4814
+},
+"13151": {
+"medianIncome": 82379,
+"population": 254613,
+"households": 101845
+},
+"13153": {
+"medianIncome": 71237,
+"population": 171974,
+"households": 68790
+},
+"13155": {
+"medianIncome": 49224,
+"population": 9120,
+"households": 3648
+},
+"13157": {
+"medianIncome": 82138,
+"population": 88615,
+"households": 35446
+},
+"13159": {
+"medianIncome": 63718,
+"population": 16455,
+"households": 6582
+},
+"13161": {
+"medianIncome": 46143,
+"population": 14906,
+"households": 5962
+},
+"13163": {
+"medianIncome": 44459,
+"population": 15183,
+"households": 6073
+},
+"13165": {
+"medianIncome": 41830,
+"population": 8627,
+"households": 3451
+},
+"13167": {
+"medianIncome": 42603,
+"population": 9282,
+"households": 3713
+},
+"13169": {
+"medianIncome": 65515,
+"population": 28969,
+"households": 11588
+},
+"13171": {
+"medianIncome": 61542,
+"population": 20401,
+"households": 8160
+},
+"13173": {
+"medianIncome": 50671,
+"population": 10452,
+"households": 4181
+},
+"13175": {
+"medianIncome": 47918,
+"population": 49941,
+"households": 19976
+},
+"13177": {
+"medianIncome": 84260,
+"population": 33872,
+"households": 13549
+},
+"13179": {
+"medianIncome": 59807,
+"population": 69210,
+"households": 27684
+},
+"13181": {
+"medianIncome": 69776,
+"population": 7879,
+"households": 3152
+},
+"13183": {
+"medianIncome": 71285,
+"population": 19594,
+"households": 7838
+},
+"13185": {
+"medianIncome": 52623,
+"population": 120712,
+"households": 48285
+},
+"13187": {
+"medianIncome": 71486,
+"population": 35258,
+"households": 14103
+},
+"13189": {
+"medianIncome": 50593,
+"population": 21799,
+"households": 8720
+},
+"13191": {
+"medianIncome": 51411,
+"population": 11501,
+"households": 4600
+},
+"13193": {
+"medianIncome": 40089,
+"population": 11817,
+"households": 4727
+},
+"13195": {
+"medianIncome": 58789,
+"population": 32191,
+"households": 12876
+},
+"13197": {
+"medianIncome": 47174,
+"population": 7440,
+"households": 2976
+},
+"13199": {
+"medianIncome": 53019,
+"population": 20931,
+"households": 8372
+},
+"13201": {
+"medianIncome": 45201,
+"population": 5747,
+"households": 2299
+},
+"13205": {
+"medianIncome": 45296,
+"population": 21114,
+"households": 8446
+},
+"13207": {
+"medianIncome": 76428,
+"population": 30625,
+"households": 12250
+},
+"13209": {
+"medianIncome": 48356,
+"population": 8761,
+"households": 3504
+},
+"13211": {
+"medianIncome": 74340,
+"population": 21460,
+"households": 8584
+},
+"13213": {
+"medianIncome": 62109,
+"population": 41035,
+"households": 16414
+},
+"13215": {
+"medianIncome": 53740,
+"population": 201877,
+"households": 80751
+},
+"13217": {
+"medianIncome": 72128,
+"population": 120135,
+"households": 48054
+},
+"13219": {
+"medianIncome": 114758,
+"population": 44182,
+"households": 17673
+},
+"13221": {
+"medianIncome": 62504,
+"population": 15754,
+"households": 6302
+},
+"13223": {
+"medianIncome": 87459,
+"population": 183164,
+"households": 73266
+},
+"13225": {
+"medianIncome": 58471,
+"population": 28805,
+"households": 11522
+},
+"13227": {
+"medianIncome": 71955,
+"population": 35969,
+"households": 14388
+},
+"13229": {
+"medianIncome": 52695,
+"population": 20425,
+"households": 8170
+},
+"13231": {
+"medianIncome": 80626,
+"population": 20461,
+"households": 8184
+},
+"13233": {
+"medianIncome": 54894,
+"population": 44223,
+"households": 17689
+},
+"13235": {
+"medianIncome": 46975,
+"population": 10095,
+"households": 4038
+},
+"13237": {
+"medianIncome": 62241,
+"population": 23129,
+"households": 9252
+},
+"13239": {
+"medianIncome": 41516,
+"population": 2280,
+"households": 912
+},
+"13241": {
+"medianIncome": 63387,
+"population": 17442,
+"households": 6977
+},
+"13243": {
+"medianIncome": 39188,
+"population": 6078,
+"households": 2431
+},
+"13245": {
+"medianIncome": 50079,
+"population": 205414,
+"households": 82166
+},
+"13247": {
+"medianIncome": 71984,
+"population": 95987,
+"households": 38395
+},
+"13249": {
+"medianIncome": 57510,
+"population": 4526,
+"households": 1810
+},
+"13251": {
+"medianIncome": 52713,
+"population": 14174,
+"households": 5670
+},
+"13253": {
+"medianIncome": 45223,
+"population": 9092,
+"households": 3637
+},
+"13255": {
+"medianIncome": 55086,
+"population": 69946,
+"households": 27978
+},
+"13257": {
+"medianIncome": 51980,
+"population": 27228,
+"households": 10891
+},
+"13259": {
+"medianIncome": 41158,
+"population": 4674,
+"households": 1870
+},
+"13261": {
+"medianIncome": 44677,
+"population": 28890,
+"households": 11556
+},
+"13263": {
+"medianIncome": 45163,
+"population": 5718,
+"households": 2287
+},
+"13265": {
+"medianIncome": 42138,
+"population": 1609,
+"households": 644
+},
+"13267": {
+"medianIncome": 47401,
+"population": 24296,
+"households": 9718
+},
+"13269": {
+"medianIncome": 44035,
+"population": 7758,
+"households": 3103
+},
+"13271": {
+"medianIncome": 41547,
+"population": 10920,
+"households": 4368
+},
+"13273": {
+"medianIncome": 53281,
+"population": 8718,
+"households": 3487
+},
+"13275": {
+"medianIncome": 52236,
+"population": 45649,
+"households": 18260
+},
+"13277": {
+"medianIncome": 52962,
+"population": 41554,
+"households": 16622
+},
+"13279": {
+"medianIncome": 45125,
+"population": 27040,
+"households": 10816
+},
+"13281": {
+"medianIncome": 59273,
+"population": 13035,
+"households": 5214
+},
+"13283": {
+"medianIncome": 43533,
+"population": 6341,
+"households": 2536
+},
+"13285": {
+"medianIncome": 55852,
+"population": 70742,
+"households": 28297
+},
+"13287": {
+"medianIncome": 40865,
+"population": 8909,
+"households": 3564
+},
+"13289": {
+"medianIncome": 48772,
+"population": 7691,
+"households": 3076
+},
+"13291": {
+"medianIncome": 64588,
+"population": 27124,
+"households": 10850
+},
+"13293": {
+"medianIncome": 48061,
+"population": 28263,
+"households": 11305
+},
+"13295": {
+"medianIncome": 53407,
+"population": 69489,
+"households": 27796
+},
+"13297": {
+"medianIncome": 83037,
+"population": 106702,
+"households": 42681
+},
+"13299": {
+"medianIncome": 48245,
+"population": 36243,
+"households": 14497
+},
+"13301": {
+"medianIncome": 44367,
+"population": 5106,
+"households": 2042
+},
+"13303": {
+"medianIncome": 48462,
+"population": 19820,
+"households": 7928
+},
+"13305": {
+"medianIncome": 51102,
+"population": 31373,
+"households": 12549
+},
+"13307": {
+"medianIncome": 45987,
+"population": 2337,
+"households": 935
+},
+"13309": {
+"medianIncome": 35952,
+"population": 7081,
+"households": 2832
+},
+"13311": {
+"medianIncome": 62100,
+"population": 29026,
+"households": 11610
+},
+"13313": {
+"medianIncome": 61680,
+"population": 103687,
+"households": 41475
+},
+"13315": {
+"medianIncome": 44905,
+"population": 8779,
+"households": 3512
+},
+"13317": {
+"medianIncome": 47377,
+"population": 9518,
+"households": 3807
+},
+"13319": {
+"medianIncome": 49648,
+"population": 8725,
+"households": 3490
+},
+"13321": {
+"medianIncome": 48956,
+"population": 20273,
+"households": 8109
+}
+}
