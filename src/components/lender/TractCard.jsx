@@ -4,7 +4,7 @@ function scoreBandClasses(score) {
   return 'bg-[#97C459] text-white'
 }
 
-export default function TractCard({ tract, isSelected, onSelect, onRefer }) {
+export default function TractCard({ tract, isSelected, onSelect }) {
   const {
     name,
     opportunity_score: score,
@@ -13,8 +13,6 @@ export default function TractCard({ tract, isSelected, onSelect, onRefer }) {
     energy_burden_pct,
     household_count,
   } = tract
-
-  const showRefer = score >= 60
 
   return (
     <div
@@ -59,19 +57,6 @@ export default function TractCard({ tract, isSelected, onSelect, onRefer }) {
           <div className="text-gray-900">{household_count?.toLocaleString?.() ?? household_count}</div>
         </div>
       </div>
-
-      {showRefer && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            onRefer()
-          }}
-          className="mt-4 w-full rounded-xl bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 transition"
-        >
-          Refer to OneEthos financing
-        </button>
-      )}
     </div>
   )
 }
