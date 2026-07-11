@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import ReferralModal from './components/ReferralModal'
+import ReferralLoadingScreen from './components/ReferralLoadingScreen'
 import Hero from './components/homeowner/Hero'
 import OpportunityMap from './components/lender/OpportunityMap'
 import TractSidebar from './components/lender/TractSidebar'
@@ -21,6 +22,7 @@ export default function App() {
 
   // Shared referral modal state
   const [referral, setReferral] = useState({ open: false, target: null, decision: null })
+  const [referralLoading, setReferralLoading] = useState(false)
 
   useEffect(() => {
     getTractScores().then((fc) => {
@@ -40,8 +42,15 @@ export default function App() {
   }
 
   async function openReferral(target, amount) {
-    const res = await referToLender(target, { amount })
-    setReferral({ open: true, target, decision: res })
+    setReferral({ open: false, target, decision: null })
+    setReferralLoading(true)
+
+    try {
+      const res = await referToLender(target, { amount })
+      setReferral({ open: true, target, decision: res })
+    } finally {
+      setReferralLoading(false)
+    }
   }
 
   function closeReferral() {
@@ -81,7 +90,7 @@ export default function App() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-6 md:h-[720px] md:flex-row">
+            <div className="flex flex-col gap-6 md:h-[880px] md:flex-row">
               <div className="flex min-h-0 flex-col gap-3 md:w-[60%]">
                 <div className="min-h-0 flex-1">
                   <OpportunityMap
@@ -116,6 +125,7 @@ export default function App() {
         </main>
       )}
 
+      {referralLoading && <ReferralLoadingScreen target={referral.target} />}
       <ReferralModal
         open={referral.open}
         onClose={closeReferral}

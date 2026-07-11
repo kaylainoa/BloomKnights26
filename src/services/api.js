@@ -493,7 +493,7 @@ function amortizedMonthlyPayment(principal, apr, months) {
  *   `amount` (defaults to a typical $18k solar loan) over OneEthos' standard terms.
  */
 export async function referToLender(tractIdOrAddress, { amount } = {}) {
-  await delay(500)
+  await delay(2000)
 
   const approvedAmount = Math.round(amount && amount > 0 ? amount : 18000)
   const monthlyPayment = amortizedMonthlyPayment(
