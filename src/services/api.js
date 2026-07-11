@@ -111,7 +111,8 @@ function analysisFromBuildingInsights(insights, address) {
   const twentyYearSavings = cash?.savings?.savingsLifetime?.units
     ? Math.round(Number(cash.savings.savingsLifetime.units))
     : monthlySavings * 12 * 20
-  const paybackYears = cash?.paybackYears ?? Math.round((systemCostAfterCredit / (monthlySavings * 12)) * 10) / 10
+  const rawPaybackYears = cash?.paybackYears ?? systemCostAfterCredit / (monthlySavings * 12)
+  const paybackYears = Math.round(rawPaybackYears * 100) / 100
 
   const sunshineHours = potential.maxSunshineHoursPerYear || 0
   const roofSuitability = sunshineHours > 1400 ? 'excellent' : sunshineHours > 900 ? 'good' : 'poor'
