@@ -354,13 +354,30 @@ export async function getTractScores() {
 
   const liveGhiByGeoid = {}
   if (NREL_API_KEY) {
-    await Promise.all(
-      counties.map(async (feature) => {
-        const geoid = feature.properties.GEOID
-        const { lat, lng } = centroidByGeoid[geoid]
-        liveGhiByGeoid[geoid] = await safely(() => fetchCountySolarResource(lat, lng), `NREL API (${geoid})`)
-      })
+    // NREL's API sends no CORS headers, so every one of these calls fails from a browser
+    // regardless of key validity (same situation as the Census API above). Rather than paying
+    // for 226 doomed fetches (one per county) before falling back, probe with a single county
+    // first — if that fails, skip the rest and go straight to the latitude estimate for
+    // everyone. If NREL ever adds CORS support or this runs behind a proxy, the probe succeeds
+    // and every county still gets a live value.
+    const probeFeature = counties[0]
+    const probeGeoid = probeFeature.properties.GEOID
+    const probeCentroid = centroidByGeoid[probeGeoid]
+    const probeResult = await safely(
+      () => fetchCountySolarResource(probeCentroid.lat, probeCentroid.lng),
+      `NREL API (${probeGeoid})`
     )
+
+    if (probeResult !== null) {
+      liveGhiByGeoid[probeGeoid] = probeResult
+      await Promise.all(
+        counties.slice(1).map(async (feature) => {
+          const geoid = feature.properties.GEOID
+          const { lat, lng } = centroidByGeoid[geoid]
+          liveGhiByGeoid[geoid] = await safely(() => fetchCountySolarResource(lat, lng), `NREL API (${geoid})`)
+        })
+      )
+    }
   }
 
   // Every county gets an effective GHI — live from NREL where it succeeded, otherwise the
