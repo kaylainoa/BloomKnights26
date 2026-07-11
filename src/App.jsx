@@ -23,7 +23,7 @@ export default function App() {
   const [selectedTractId, setSelectedTractId] = useState(null)
 
   // Shared referral modal state
-  const [referral, setReferral] = useState({ open: false, referralId: null, target: null })
+  const [referral, setReferral] = useState({ open: false, target: null, decision: null })
 
   useEffect(() => {
     getTractScores().then((fc) => {
@@ -42,13 +42,13 @@ export default function App() {
     setLoadingAnalysis(false)
   }
 
-  async function openReferral(target) {
-    const res = await referToLender(target)
-    setReferral({ open: true, referralId: res.referralId, target })
+  async function openReferral(target, amount) {
+    const res = await referToLender(target, { amount })
+    setReferral({ open: true, target, decision: res })
   }
 
   function closeReferral() {
-    setReferral({ open: false, referralId: null, target: null })
+    setReferral({ open: false, target: null, decision: null })
   }
 
   return (
@@ -71,7 +71,7 @@ export default function App() {
                 <ResultsCard
                   analysis={analysis}
                   loading={false}
-                  onOpenReferral={() => openReferral(analysis?.address)}
+                  onOpenReferral={() => openReferral(analysis?.address, analysis?.systemCostAfterCredit)}
                   onAskQuestion={() => console.log('Ask a question stub')}
                 />
               </div>
@@ -113,8 +113,8 @@ export default function App() {
       <ReferralModal
         open={referral.open}
         onClose={closeReferral}
-        referralId={referral.referralId}
         target={referral.target}
+        decision={referral.decision}
       />
     </div>
   )

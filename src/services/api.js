@@ -404,21 +404,52 @@ export async function generateSummary(analysis) {
   return analysis.aiSummary
 }
 
+// OneEthos solar-loan terms used to fake an instant financing decision.
+const ONEETHOS_APR = 0.0699 // 6.99% fixed
+const ONEETHOS_TERM_MONTHS = 240 // 20-year solar loan
+
+// Standard fixed-rate amortization: monthly payment on `principal` at `apr`
+// over `months`.
+function amortizedMonthlyPayment(principal, apr, months) {
+  const r = apr / 12
+  if (r === 0) return Math.round(principal / months)
+  const payment = (principal * r) / (1 - Math.pow(1 + r, -months))
+  return Math.round(payment)
+}
+
 /**
- * referToLender(tractIdOrAddress)
- * --------------------------------
- * REAL API: OneEthos financing referral endpoint (partner-provided stub for the hackathon).
+ * referToLender(tractIdOrAddress, { amount })
+ * -------------------------------------------
+ * REAL API: OneEthos financing referral + instant pre-qualification endpoint
+ *   (partner-provided stub for the hackathon).
  *   POST https://api.oneethos.com/v1/referrals
- *   Request: { source: 'solarscope', tractId | address, contactEmail, timestamp }
- *   Response: { referralId, status: 'received' }
+ *   Request: { source: 'solarscope', tractId | address, amount, contactEmail, timestamp }
+ *   Response: { referralId, status, decision, approvedAmount, apr, termMonths, monthlyPayment }
  * Swap point: replace the body of this function with the real POST call once OneEthos
- *   provides sandbox credentials; components only care about the resolved { success, referralId }.
+ *   provides sandbox credentials; components only care about the resolved shape below.
+ *
+ * FAKE: always approves, and derives a monthly payment by amortizing the requested
+ *   `amount` (defaults to a typical $18k solar loan) over OneEthos' standard terms.
  */
-export async function referToLender(tractIdOrAddress) {
+export async function referToLender(tractIdOrAddress, { amount } = {}) {
   await delay(500)
+
+  const approvedAmount = Math.round(amount && amount > 0 ? amount : 18000)
+  const monthlyPayment = amortizedMonthlyPayment(
+    approvedAmount,
+    ONEETHOS_APR,
+    ONEETHOS_TERM_MONTHS
+  )
+
   return {
     success: true,
     referralId: `REF-${Math.random().toString(36).slice(2, 9).toUpperCase()}`,
     target: tractIdOrAddress,
+    status: 'received',
+    decision: 'approved',
+    approvedAmount,
+    apr: ONEETHOS_APR,
+    termMonths: ONEETHOS_TERM_MONTHS,
+    monthlyPayment,
   }
 }
