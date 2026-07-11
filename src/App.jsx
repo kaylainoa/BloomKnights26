@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import ReferralModal from './components/ReferralModal'
 import Hero from './components/homeowner/Hero'
-import AddressSearch from './components/homeowner/AddressSearch'
-import LoadingScreen from './components/homeowner/LoadingScreen'
-import ResultsCard from './components/homeowner/ResultsCard'
 import OpportunityMap from './components/lender/OpportunityMap'
 import TractSidebar from './components/lender/TractSidebar'
 import { getPropertyAnalysis, getTractScores, generateSummary, referToLender } from './services/api'
@@ -51,33 +48,29 @@ export default function App() {
     setReferral({ open: false, target: null, decision: null })
   }
 
+  function goHome() {
+    setView('homeowner')
+    setAnalysis(null)
+    setLoadingAnalysis(false)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header view={view} onChangeView={setView} />
+      <Header view={view} onChangeView={setView} onGoHome={goHome} />
 
-      {view === 'homeowner' && !loadingAnalysis && !analysis && (
-        <Hero onSelectAddress={handleSelectAddress} />
+      {view === 'homeowner' && (
+        <Hero
+          mode={loadingAnalysis ? 'loading' : analysis ? 'results' : 'search'}
+          onSelectAddress={handleSelectAddress}
+          pendingAddress={pendingAddress}
+          analysis={analysis}
+          onOpenReferral={() => openReferral(analysis?.address, analysis?.systemCostAfterCredit)}
+          onAskQuestion={() => console.log('Ask a question stub')}
+        />
       )}
 
-      <main className="mx-auto max-w-7xl px-6 py-10">
-        {view === 'homeowner' ? (
-          loadingAnalysis ? (
-            <LoadingScreen address={pendingAddress} />
-          ) : (
-            analysis && (
-              <div className="space-y-6">
-                <AddressSearch onSelectAddress={handleSelectAddress} />
-
-                <ResultsCard
-                  analysis={analysis}
-                  loading={false}
-                  onOpenReferral={() => openReferral(analysis?.address, analysis?.systemCostAfterCredit)}
-                  onAskQuestion={() => console.log('Ask a question stub')}
-                />
-              </div>
-            )
-          )
-        ) : (
+      {view === 'lender' && (
+        <main className="mx-auto max-w-7xl px-6 py-10">
           <div className="space-y-6">
             <div className="space-y-2">
               <h1 className="text-2xl font-semibold text-gray-900">
@@ -120,8 +113,8 @@ export default function App() {
               </div>
             </div>
           </div>
-        )}
-      </main>
+        </main>
+      )}
 
       <ReferralModal
         open={referral.open}
