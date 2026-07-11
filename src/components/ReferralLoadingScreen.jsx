@@ -1,4 +1,4 @@
-import { Loader2, Sparkles } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 export default function ReferralLoadingScreen({ target }) {
   return (
@@ -21,7 +21,6 @@ export default function ReferralLoadingScreen({ target }) {
         </div>
 
         <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
-          <Sparkles className="h-4 w-4 text-amber-400" />
           <span>Thank you for choosing OneEthos.</span>
         </div>
       </div>

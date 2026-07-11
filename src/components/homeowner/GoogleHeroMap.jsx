@@ -40,14 +40,18 @@ export default function GoogleHeroMap({ target, label }) {
 
   // Init the map once.
   useEffect(() => {
-    if (!GOOGLE_MAPS_API_KEY || !containerRef.current) return
+    // Guard against React StrictMode's dev-only double-invoke of effects: the container div
+    // persists across the fake mount/unmount/remount, so without this a second Map instance
+    // gets created on top of the first, corrupting the DOM Google Maps manages and crashing
+    // React's cleanup (removeChild) whenever this component later unmounts for real.
+    if (!GOOGLE_MAPS_API_KEY || !containerRef.current || mapRef.current) return
     let cancelled = false
 
     loadGoogleMaps(GOOGLE_MAPS_API_KEY)
       .then(async (maps) => {
-        if (cancelled || !containerRef.current) return
+        if (cancelled || !containerRef.current || mapRef.current) return
         await maps.importLibrary('marker')
-        if (cancelled || !containerRef.current) return
+        if (cancelled || !containerRef.current || mapRef.current) return
 
         mapRef.current = new maps.Map(containerRef.current, {
           center: CONTINENTAL_US_CENTER,

@@ -64,10 +64,10 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen overflow-hidden bg-gray-50 flex flex-col">
       <Header view={view} onChangeView={setView} onGoHome={goHome} />
 
-      {view === 'homeowner' && (
+      <div className={`flex-1 min-h-0 ${view === 'homeowner' ? '' : 'hidden'}`}>
         <Hero
           mode={loadingAnalysis ? 'loading' : analysis ? 'results' : 'search'}
           onSelectAddress={handleSelectAddress}
@@ -76,10 +76,12 @@ export default function App() {
           onOpenReferral={() => openReferral(analysis?.address, analysis?.systemCostAfterCredit)}
           onAskQuestion={() => console.log('Ask a question stub')}
         />
-      )}
+      </div>
 
-      {view === 'lender' && (
-        <main className="mx-auto max-w-7xl px-6 py-10">
+      {/* Always mounted (just hidden) once first shown — GoogleOpportunityMap manages DOM
+          nodes directly inside its container that React can't safely tear down on unmount,
+          so this view is toggled with CSS instead of conditional rendering. */}
+      <main className={`flex-1 min-h-0 overflow-y-auto mx-auto w-full max-w-7xl px-6 py-10 ${view === 'lender' ? '' : 'hidden'}`}>
           <div className="space-y-6">
             <div className="space-y-2">
               <h1 className="text-2xl font-semibold text-gray-900">
@@ -122,8 +124,7 @@ export default function App() {
               </div>
             </div>
           </div>
-        </main>
-      )}
+      </main>
 
       {referralLoading && <ReferralLoadingScreen target={referral.target} />}
       <ReferralModal

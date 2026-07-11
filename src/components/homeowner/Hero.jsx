@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sparkles, Zap, ShieldCheck, Clock } from 'lucide-react'
+import { Zap, ShieldCheck, Clock } from 'lucide-react'
 import AddressSearch from './AddressSearch'
 import GoogleHeroMap from './GoogleHeroMap'
 import LoadingScreen from './LoadingScreen'
@@ -36,7 +36,7 @@ export default function Hero({
   const showResults = mode !== 'search'
 
   return (
-    <section className="relative w-full overflow-hidden bg-white">
+    <section className="relative w-full h-full bg-white">
       {/* Ambient background wash */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-40 right-[-10%] h-[520px] w-[520px] rounded-full bg-blue-200/40 blur-3xl" />
@@ -54,23 +54,24 @@ export default function Hero({
       </div>
 
       <div
-        className={`relative mx-auto grid grid-cols-1 items-center gap-10 px-6 md:px-12 max-w-7xl transition-all duration-700 ease-snappy ${
-          showResults ? 'md:grid-cols-[1fr_0.85fr] py-10' : 'md:grid-cols-[1.2fr_1fr] min-h-[calc(100vh-80px)]'
+        className={`relative mx-auto h-full grid grid-cols-1 items-center gap-10 px-6 md:px-12 py-6 max-w-7xl transition-all duration-700 ease-snappy ${
+          showResults ? 'md:grid-cols-[1fr_0.85fr]' : 'md:grid-cols-[1.2fr_1fr]'
         }`}
       >
         {/* Text / search / results column */}
-        <div className={`min-w-0 ${showResults ? 'md:order-2' : 'md:order-1 max-w-xl mx-auto md:mx-0 text-left animate-fade-slide-in'}`}>
+        <div
+          className={`min-w-0 h-full ${
+            showResults
+              ? 'md:order-2 overflow-y-auto'
+              : 'md:order-1 max-w-xl mx-auto md:mx-0 text-left animate-fade-slide-in flex flex-col justify-center'
+          }`}
+        >
           {mode === 'search' && (
             <>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-                <Sparkles className="h-3.5 w-3.5" />
-                Instant, AI-powered solar analysis
-              </span>
-
-              <h1 className="mt-5 text-6xl md:text-7xl font-bold tracking-tight leading-[1.05] text-slate-900">
+              <h1 className="mt-5 text-7xl md:text-8xl font-serif font-semibold tracking-tight leading-[1.05] text-slate-900">
                 Clean energy,
                 <br />
-                <span className="bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
+                <span className="text-yellow-500">
                   clear savings
                 </span>
               </h1>
@@ -115,9 +116,7 @@ export default function Hero({
 
         {/* Map column: full US on search, pinned + zoomed once a search starts */}
         <div
-          className={`relative min-w-0 w-full ${
-            showResults ? 'md:order-1 h-[320px] md:h-[calc(100vh-140px)] md:sticky md:top-24' : 'md:order-2 h-[280px] md:h-[520px]'
-          }`}
+          className={`relative min-w-0 w-full h-full ${showResults ? 'md:order-1' : 'md:order-2'}`}
         >
           <GoogleHeroMap target={mapTarget} label={mapLabel} />
         </div>

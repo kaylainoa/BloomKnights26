@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import stateBoundariesGeojson from '../../data/stateBoundaries.geojson?raw'
+import GoogleOpportunityMap from './GoogleOpportunityMap'
 
 const STATE_BOUNDARIES = JSON.parse(stateBoundariesGeojson).features
+const GOOGLE_MAPS_API_KEY = import.meta.env.GOOGLE_MAPS_API_KEY
 
 const RED = '#E24B4A'
 const AMBER = '#EF9F27'
@@ -203,6 +205,13 @@ export default function OpportunityMap({ features, selectedTractId, onSelectTrac
         <div className="flex h-full w-full items-center justify-center bg-gray-50 text-sm text-gray-500">
           Loading map…
         </div>
+      ) : GOOGLE_MAPS_API_KEY ? (
+        <GoogleOpportunityMap
+          features={safeFeatures}
+          selectedTractId={selectedTractId}
+          onSelectTract={onSelectTract}
+          onHoverTract={onHoverTract}
+        />
       ) : (
         <SvgFallbackMap
           features={safeFeatures}
