@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Sparkles, Zap, ShieldCheck, Clock } from 'lucide-react'
 import AddressSearch from './AddressSearch'
+import GoogleHeroMap from './GoogleHeroMap'
 import LoadingScreen from './LoadingScreen'
 import ResultsCard from './ResultsCard'
 import heroNature from '../../assets/hero-nature.jpg'
@@ -9,8 +11,10 @@ import heroVideo from '../../assets/landing-video.mp4'
  * Hero
  * ----
  * Persistent shell for the whole homeowner flow.
- * - mode === 'search': full-bleed video-background landing screen.
- * - mode === 'loading' | 'results': single centered column (no map).
+ * - mode === 'search': full-bleed video-background landing screen (no map yet — nothing to
+ *   zoom to until an address is picked).
+ * - mode === 'loading' | 'results': teammate's original two-column layout with GoogleHeroMap
+ *   pinned to one side, staying mounted across that transition so the map never remounts.
  * Props:
  *  - mode: 'search' | 'loading' | 'results'
  *  - onSelectAddress(address: string): forwarded to AddressSearch.
@@ -25,6 +29,14 @@ export default function Hero({
   onRequestQuote,
   requests,
 }) {
+  const [mapTarget, setMapTarget] = useState(null)
+  const [mapLabel, setMapLabel] = useState(null)
+
+  function handleCoordinates(coords, text) {
+    setMapTarget(coords)
+    setMapLabel(text)
+  }
+
   if (mode === 'search') {
     return (
       <section className="relative h-[calc(100vh-80px)] w-full flex items-center overflow-hidden bg-sky-50">
@@ -87,6 +99,8 @@ export default function Hero({
     )
   }
 
+  const showResults = mode === 'results'
+
   return (
     <section className="relative w-full h-full bg-white">
       {/* Ambient background wash */}
@@ -105,20 +119,42 @@ export default function Hero({
         />
       </div>
 
-      <div className="relative mx-auto h-full max-w-3xl overflow-y-auto px-6 py-6 md:px-12">
-        {mode === 'loading' && <LoadingScreen address={pendingAddress} />}
+      <div
+        className={`relative mx-auto h-full grid grid-cols-1 items-center gap-10 px-6 md:px-12 py-6 max-w-7xl transition-all duration-700 ease-snappy overflow-y-auto ${
+          showResults ? 'lg:grid-cols-[1fr_0.85fr]' : 'md:grid-cols-[1.2fr_1fr]'
+        }`}
+      >
+        {/* Text / loading / results column */}
+        <div
+          className={`min-w-0 h-full ${
+            showResults ? 'lg:order-2 py-6 lg:py-0 lg:overflow-y-auto' : 'md:order-1'
+          }`}
+        >
+          {mode === 'loading' && <LoadingScreen address={pendingAddress} />}
 
-        {mode === 'results' && (
-          <div className="space-y-6">
-            <AddressSearch onSelectAddress={onSelectAddress} />
-            <ResultsCard
-              analysis={analysis}
-              loading={false}
-              onRequestQuote={onRequestQuote}
-              requests={requests}
-            />
-          </div>
-        )}
+          {showResults && (
+            <div className="space-y-6">
+              <AddressSearch onSelectAddress={onSelectAddress} onCoordinates={handleCoordinates} />
+              <ResultsCard
+                analysis={analysis}
+                loading={false}
+                onRequestQuote={onRequestQuote}
+                requests={requests}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Map column: pinned + zoomed to the searched address. Hidden below lg in results
+            mode — there isn't enough room to show it alongside results without squeezing them
+            into overflow, so results get the full width instead. */}
+        <div
+          className={`relative min-w-0 w-full h-full min-h-[280px] ${
+            showResults ? 'hidden lg:block lg:order-1' : 'md:order-2'
+          }`}
+        >
+          <GoogleHeroMap target={mapTarget} label={mapLabel} />
+        </div>
       </div>
     </section>
   )
