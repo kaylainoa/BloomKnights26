@@ -1,8 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import confetti from 'canvas-confetti'
 import { Star, MapPin, X, CheckCircle2, Clock } from 'lucide-react'
 import AiSummary from './AiSummary'
 import AltPathCard from './AltPathCard'
 import { getNearbyInstallers } from '../../services/api'
+
+// Quick celebratory burst from both bottom corners when a financing approval comes in.
+function celebrateApproval() {
+  const colors = ['#16a34a', '#22c55e', '#4ade80', '#facc15']
+  confetti({ particleCount: 90, spread: 70, origin: { x: 0.15, y: 0.8 }, colors })
+  confetti({ particleCount: 90, spread: 70, origin: { x: 0.85, y: 0.8 }, colors })
+}
 
 // Fallback when the Places API is unavailable/unconfigured — keeps the section populated
 // instead of showing an empty state.
@@ -354,6 +362,14 @@ export default function ResultsCard({
 
   const approval = requests.find((r) => r.status === 'approved')
   const pending = !approval && requests.find((r) => r.status !== 'approved')
+
+  // Celebrate once per approval, not on every re-render while it stays approved.
+  const celebratedIdRef = useRef(null)
+  useEffect(() => {
+    if (!approval || celebratedIdRef.current === approval.id) return
+    celebratedIdRef.current = approval.id
+    celebrateApproval()
+  }, [approval])
 
   // Per-installer status for the card CTA: approved wins over a pending request.
   const installerStatus = (name) => {

@@ -13,7 +13,7 @@ import { CheckCircle2, Inbox } from 'lucide-react'
  *  - selectedGeoid: GEOID of the currently-focused county, for highlighting the matching request.
  *  - onSelectRequest(request): focus the request's county in the Top Opportunity Counties sidebar.
  */
-export default function QuoteRequestsPanel({ requests, onRefer, selectedGeoid, onSelectRequest }) {
+export default function QuoteRequestsPanel({ requests, onRefer, referringIds = [], selectedGeoid, onSelectRequest }) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5">
       <div className="flex items-center gap-2">
@@ -83,6 +83,11 @@ export default function QuoteRequestsPanel({ requests, onRefer, selectedGeoid, o
                   <div className="flex items-center gap-2 rounded-xl bg-green-50 px-3 py-2 text-sm font-medium text-green-800">
                     <CheckCircle2 className="h-4 w-4" />
                     Approved · ${r.decision?.monthlyPayment?.toLocaleString()}/mo
+                  </div>
+                ) : referringIds.includes(r.id) ? (
+                  <div className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500 sm:w-auto">
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-500" />
+                    Reviewing…
                   </div>
                 ) : (
                   <button

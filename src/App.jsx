@@ -29,6 +29,8 @@ export default function App() {
 
   // Quote requests submitted by homeowners, surfaced to the lender for OneEthos referral.
   const [quoteRequests, setQuoteRequests] = useState([])
+  // Request ids currently awaiting a OneEthos decision, so the "Refer" button can't be double-clicked.
+  const [referringIds, setReferringIds] = useState([])
 
   useEffect(() => {
     getTractScores().then((fc) => {
@@ -87,12 +89,14 @@ export default function App() {
   // Lender refers a homeowner's quote request to OneEthos; on approval the homeowner's
   // tab reflects the decision (matched by request id).
   async function handleReferQuoteRequest(request) {
+    setReferringIds((prev) => [...prev, request.id])
     const res = await referToLender(request.address, { amount: request.amount })
     setQuoteRequests((prev) =>
       prev.map((r) =>
         r.id === request.id ? { ...r, status: 'approved', decision: res } : r
       )
     )
+    setReferringIds((prev) => prev.filter((id) => id !== request.id))
   }
 
   const requestsForCurrentAddress = quoteRequests.filter(
@@ -139,6 +143,7 @@ export default function App() {
             <QuoteRequestsPanel
               requests={quoteRequests}
               onRefer={handleReferQuoteRequest}
+              referringIds={referringIds}
               selectedGeoid={selectedTractId}
               onSelectRequest={handleSelectRequest}
             />
