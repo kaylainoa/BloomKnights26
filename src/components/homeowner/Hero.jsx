@@ -54,15 +54,15 @@ export default function Hero({
       </div>
 
       <div
-        className={`relative mx-auto h-full grid grid-cols-1 items-center gap-10 px-6 md:px-12 py-6 max-w-7xl transition-all duration-700 ease-snappy ${
-          showResults ? 'md:grid-cols-[1fr_0.85fr]' : 'md:grid-cols-[1.2fr_1fr]'
+        className={`relative mx-auto h-full grid grid-cols-1 items-center gap-10 px-6 md:px-12 py-6 max-w-7xl transition-all duration-700 ease-snappy overflow-y-auto ${
+          showResults ? 'lg:grid-cols-[1fr_0.85fr]' : 'md:grid-cols-[1.2fr_1fr]'
         }`}
       >
         {/* Text / search / results column */}
         <div
           className={`min-w-0 h-full ${
             showResults
-              ? 'md:order-2 overflow-y-auto'
+              ? 'lg:order-2 py-6 lg:py-0 lg:overflow-y-auto'
               : 'md:order-1 max-w-xl mx-auto md:mx-0 text-left animate-fade-slide-in flex flex-col justify-center'
           }`}
         >
@@ -114,9 +114,13 @@ export default function Hero({
           )}
         </div>
 
-        {/* Map column: full US on search, pinned + zoomed once a search starts */}
+        {/* Map column: full US on search, pinned + zoomed once a search starts. Hidden below
+            lg in results mode — there isn't enough room to show it alongside results without
+            squeezing them into overflow, so results get the full width instead. */}
         <div
-          className={`relative min-w-0 w-full h-full ${showResults ? 'md:order-1' : 'md:order-2'}`}
+          className={`relative min-w-0 w-full h-full min-h-[280px] ${
+            showResults ? 'hidden lg:block lg:order-1' : 'md:order-2'
+          }`}
         >
           <GoogleHeroMap target={mapTarget} label={mapLabel} />
         </div>

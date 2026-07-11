@@ -140,6 +140,79 @@ export async function getPropertyAnalysis(address) {
   return { ...GENERIC_GOOD_SOLAR, address }
 }
 
+function haversineMiles(a, b) {
+  const R = 3958.8 // Earth radius in miles
+  const toRad = (d) => (d * Math.PI) / 180
+  const dLat = toRad(b.lat - a.lat)
+  const dLng = toRad(b.lng - a.lng)
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.asin(Math.sqrt(h))
+}
+
+/**
+ * getNearbyInstallers(address)
+ * -----------------------------
+ * REAL API: Google Places API (New) `places:searchText`
+ *   POST https://places.googleapis.com/v1/places:searchText
+ *   body: { textQuery: "solar panel installer", locationBias: { circle: {...} } }
+ * Response shape used: places[].displayName, rating, userRatingCount, formattedAddress,
+ *   location, businessStatus. Distance is computed client-side (haversine) from the
+ *   searched address's own geocoded coordinates — Places doesn't return distance directly.
+ * Returns null (never []) on any failure so callers can distinguish "no key / API error, use
+ * mock installers" from "API worked, this area genuinely has none nearby".
+ */
+export async function getNearbyInstallers(address) {
+  if (!GOOGLE_API_KEY) return null
+
+  try {
+    const origin = await geocodeAddress(address)
+
+    const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': GOOGLE_API_KEY,
+        'X-Goog-FieldMask':
+          'places.displayName,places.rating,places.userRatingCount,places.formattedAddress,places.location,places.businessStatus',
+      },
+      body: JSON.stringify({
+        textQuery: 'solar panel installer',
+        locationBias: {
+          circle: { center: { latitude: origin.lat, longitude: origin.lng }, radius: 40000 },
+        },
+      }),
+    })
+    if (!res.ok) throw new Error(`Places API ${res.status}`)
+    const data = await res.json()
+    const places = (data.places || []).filter((p) => p.businessStatus !== 'CLOSED_PERMANENTLY')
+    if (!places.length) return null
+
+    const withDistance = places.map((p) => ({
+      name: p.displayName?.text ?? 'Local solar installer',
+      rating: p.rating ?? null,
+      reviews: p.userRatingCount ?? 0,
+      address: p.formattedAddress ?? null,
+      distanceMi: p.location
+        ? Math.round(haversineMiles(origin, { lat: p.location.latitude, lng: p.location.longitude }) * 10) / 10
+        : null,
+    }))
+
+    withDistance.sort((a, b) => (a.distanceMi ?? 999) - (b.distanceMi ?? 999))
+
+    // Tag the single highest-rated nearby installer, same visual treatment the mock data used.
+    const topRated = [...withDistance].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0]
+    return withDistance.slice(0, 6).map((installer) => ({
+      ...installer,
+      tag: installer === topRated ? 'Top rated' : null,
+    }))
+  } catch (err) {
+    console.warn('[SolarScope] Places installer search unavailable, using mock installers:', err.message)
+    return null
+  }
+}
+
 const CENSUS_API_KEY = import.meta.env.CENSUS_API_KEY
 const EIA_API_KEY = import.meta.env.EIA_API_KEY
 const NREL_API_KEY = import.meta.env.NREL_API_KEY

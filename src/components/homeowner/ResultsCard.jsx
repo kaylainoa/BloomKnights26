@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Star, MapPin, X, CheckCircle2, Clock } from 'lucide-react'
 import AiSummary from './AiSummary'
 import AltPathCard from './AltPathCard'
+import { getNearbyInstallers } from '../../services/api'
 
-const TOP_INSTALLERS = [
+// Fallback when the Places API is unavailable/unconfigured — keeps the section populated
+// instead of showing an empty state.
+const MOCK_INSTALLERS = [
   {
     name: 'SunPeak Solar',
     rating: 4.9,
@@ -40,22 +43,30 @@ function InstallerCard({ installer, onGetQuote, status }) {
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p className="font-semibold text-gray-900 truncate">{installer.name}</p>
-          <span className="shrink-0 rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-800">
-            {installer.tag}
-          </span>
+          {installer.tag && (
+            <span className="shrink-0 rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-800">
+              {installer.tag}
+            </span>
+          )}
         </div>
         <div className="mt-1 flex items-center gap-3 text-[13px] text-gray-500">
-          <span className="flex items-center gap-1 text-gray-700">
-            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-            {installer.rating}
-            <span className="text-gray-400">({installer.reviews})</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5" />
-            {installer.distanceMi} mi
-          </span>
+          {installer.rating != null && (
+            <span className="flex items-center gap-1 text-gray-700">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              {installer.rating}
+              <span className="text-gray-400">({installer.reviews})</span>
+            </span>
+          )}
+          {installer.distanceMi != null && (
+            <span className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" />
+              {installer.distanceMi} mi
+            </span>
+          )}
         </div>
-        <p className="mt-1.5 text-[13px] text-gray-500">{installer.blurb}</p>
+        <p className="mt-1.5 text-[13px] text-gray-500 truncate">
+          {installer.blurb ?? installer.address}
+        </p>
       </div>
       {status === 'approved' ? (
         <span className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-green-50 px-4 py-2 text-sm font-medium text-green-800">
@@ -217,12 +228,12 @@ function SkeletonBlock({ className = '' }) {
 function MetricCard({ label, value, subtext, tint }) {
   return (
     <div
-      className={`flex-1 rounded-2xl p-6 border border-gray-200 ${
+      className={`min-w-0 rounded-2xl p-6 border border-gray-200 ${
         tint ? 'bg-green-50 text-green-800' : 'bg-white text-gray-900'
       }`}
     >
       <p className="text-[13px] text-gray-500 uppercase tracking-wide">{label}</p>
-      <p className="text-4xl md:text-5xl font-semibold mt-1">{value}</p>
+      <p className="text-3xl sm:text-4xl font-semibold mt-1 break-words">{value}</p>
       {subtext && <p className="text-[13px] text-gray-500 mt-1">{subtext}</p>}
     </div>
   )
@@ -322,6 +333,24 @@ export default function ResultsCard({
   requests = [],
 }) {
   const [quoteInstaller, setQuoteInstaller] = useState(null)
+  const [installers, setInstallers] = useState(MOCK_INSTALLERS)
+  const [loadingInstallers, setLoadingInstallers] = useState(false)
+
+  useEffect(() => {
+    if (!analysis?.address || analysis.type === 'alternative') return
+    let cancelled = false
+    setLoadingInstallers(true)
+    getNearbyInstallers(analysis.address)
+      .then((real) => {
+        if (!cancelled) setInstallers(real && real.length ? real : MOCK_INSTALLERS)
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingInstallers(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [analysis?.address, analysis?.type])
 
   const approval = requests.find((r) => r.status === 'approved')
   const pending = !approval && requests.find((r) => r.status !== 'approved')
@@ -371,7 +400,7 @@ export default function ResultsCard({
         />
       ) : (
         <>
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <MetricCard
               label="System Cost"
               value={`$${analysis.systemCostAfterCredit?.toLocaleString()}`}
@@ -400,14 +429,22 @@ export default function ResultsCard({
               Highly rated pros near this address, ready to give you a quote.
             </p>
             <div className="mt-4 space-y-3">
-              {TOP_INSTALLERS.map((installer) => (
+              {loadingInstallers ? (
+                <>
+                  <SkeletonBlock className="h-24" />
+                  <SkeletonBlock className="h-24" />
+                  <SkeletonBlock className="h-24" />
+                </>
+              ) : (
+                installers.map((installer) => (
                 <InstallerCard
                   key={installer.name}
                   installer={installer}
                   onGetQuote={setQuoteInstaller}
                   status={installerStatus(installer.name)}
                 />
-              ))}
+                ))
+              )}
             </div>
           </div>
         </>
