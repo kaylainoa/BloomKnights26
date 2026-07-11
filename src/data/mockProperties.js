@@ -3,6 +3,7 @@
 
 export const GOOD_SOLAR_1 = {
   address: '412 NW 8th Ave, Gainesville, FL',
+  countyGeoid: '12001', // Alachua County, FL
   type: 'solar',
   systemSizeKw: 7.2,
   systemCost: 21600,
@@ -17,6 +18,7 @@ export const GOOD_SOLAR_1 = {
 
 export const GOOD_SOLAR_2 = {
   address: '2210 SW 34th St, Gainesville, FL',
+  countyGeoid: '12001', // Alachua County, FL
   type: 'solar',
   systemSizeKw: 9.6,
   systemCost: 28800,
@@ -31,6 +33,7 @@ export const GOOD_SOLAR_2 = {
 
 export const GOOD_SOLAR_3 = {
   address: '1305 NE 16th Ave, Gainesville, FL',
+  countyGeoid: '12001', // Alachua County, FL
   type: 'solar',
   systemSizeKw: 6.0,
   systemCost: 18000,
@@ -45,6 +48,7 @@ export const GOOD_SOLAR_3 = {
 
 export const POOR_ROOF = {
   address: '78 SE 2nd Pl, Gainesville, FL',
+  countyGeoid: '12001', // Alachua County, FL
   type: 'alternative',
   reason: 'poor_roof',
   roofSuitability: 'poor',
@@ -56,6 +60,7 @@ export const POOR_ROOF = {
 
 export const RENTER = {
   address: '900 W University Ave Apt 4B, Gainesville, FL',
+  countyGeoid: '12001', // Alachua County, FL
   type: 'alternative',
   reason: 'renter',
   aiSummary:
@@ -66,6 +71,7 @@ export const RENTER = {
 
 export const GENERIC_GOOD_SOLAR = {
   address: 'Your address',
+  countyGeoid: '12001', // Alachua County, FL — demo footprint is centered on Gainesville
   type: 'solar',
   systemSizeKw: 7.5,
   systemCost: 22500,

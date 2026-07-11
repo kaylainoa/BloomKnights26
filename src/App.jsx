@@ -19,6 +19,9 @@ export default function App() {
   const [tractFeatures, setTractFeatures] = useState([])
   const [loadingTracts, setLoadingTracts] = useState(true)
   const [selectedTractId, setSelectedTractId] = useState(null)
+  // Bumped whenever we want the map to zoom to a specific county (vs. just highlight it).
+  // The nonce lets clicking the same request twice re-zoom.
+  const [mapFocus, setMapFocus] = useState({ geoid: null, nonce: 0 })
 
   // Shared referral modal state
   const [referral, setReferral] = useState({ open: false, target: null, decision: null })
@@ -63,12 +66,21 @@ export default function App() {
         name,
         email,
         address: analysis?.address,
+        geoid: analysis?.countyGeoid ?? null,
         amount: analysis?.systemCostAfterCredit,
         status: 'pending',
         decision: null,
       },
       ...prev,
     ])
+  }
+
+  // Clicking a homeowner request focuses its county: highlights it in the Top Opportunity
+  // Counties sidebar (via selectedTractId) and zooms the map into it (via mapFocus).
+  function handleSelectRequest(request) {
+    if (!request.geoid) return
+    setSelectedTractId(request.geoid)
+    setMapFocus((f) => ({ geoid: request.geoid, nonce: f.nonce + 1 }))
   }
 
   // Lender refers a homeowner's quote request to OneEthos; on approval the homeowner's
@@ -124,6 +136,8 @@ export default function App() {
             <QuoteRequestsPanel
               requests={quoteRequests}
               onRefer={handleReferQuoteRequest}
+              selectedGeoid={selectedTractId}
+              onSelectRequest={handleSelectRequest}
             />
 
             <div className="flex flex-col gap-6 md:h-[880px] md:flex-row">
@@ -133,6 +147,8 @@ export default function App() {
                     features={tractFeatures}
                     selectedTractId={selectedTractId}
                     onSelectTract={setSelectedTractId}
+                    focusGeoid={mapFocus.geoid}
+                    focusNonce={mapFocus.nonce}
                   />
                 </div>
                 <p className="shrink-0 text-xs leading-relaxed text-gray-500">

@@ -196,7 +196,7 @@ function SvgFallbackMap({ features, selectedTractId, onSelectTract, onHoverTract
   )
 }
 
-export default function OpportunityMap({ features, selectedTractId, onSelectTract, onHoverTract }) {
+export default function OpportunityMap({ features, selectedTractId, onSelectTract, onHoverTract, focusGeoid, focusNonce }) {
   const safeFeatures = features || []
 
   return (
@@ -211,6 +211,8 @@ export default function OpportunityMap({ features, selectedTractId, onSelectTrac
           selectedTractId={selectedTractId}
           onSelectTract={onSelectTract}
           onHoverTract={onHoverTract}
+          focusGeoid={focusGeoid}
+          focusNonce={focusNonce}
         />
       ) : (
         <SvgFallbackMap
