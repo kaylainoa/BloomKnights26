@@ -3,6 +3,7 @@ import Header from './components/Header'
 import ReferralModal from './components/ReferralModal'
 import Hero from './components/homeowner/Hero'
 import AddressSearch from './components/homeowner/AddressSearch'
+import LoadingScreen from './components/homeowner/LoadingScreen'
 import ResultsCard from './components/homeowner/ResultsCard'
 import OpportunityMap from './components/lender/OpportunityMap'
 import TractSidebar from './components/lender/TractSidebar'
@@ -14,6 +15,7 @@ export default function App() {
   // Homeowner view state
   const [analysis, setAnalysis] = useState(null)
   const [loadingAnalysis, setLoadingAnalysis] = useState(false)
+  const [pendingAddress, setPendingAddress] = useState('')
 
   // Lender view state
   const [tractFeatures, setTractFeatures] = useState([])
@@ -31,6 +33,7 @@ export default function App() {
   }, [])
 
   async function handleSelectAddress(address) {
+    setPendingAddress(address)
     setLoadingAnalysis(true)
     setAnalysis(null)
     const result = await getPropertyAnalysis(address)
@@ -58,17 +61,21 @@ export default function App() {
 
       <main className="mx-auto max-w-7xl px-6 py-10">
         {view === 'homeowner' ? (
-          (loadingAnalysis || analysis) && (
-            <div className="space-y-6">
-              <AddressSearch onSelectAddress={handleSelectAddress} />
+          loadingAnalysis ? (
+            <LoadingScreen address={pendingAddress} />
+          ) : (
+            analysis && (
+              <div className="space-y-6">
+                <AddressSearch onSelectAddress={handleSelectAddress} />
 
-              <ResultsCard
-                analysis={analysis}
-                loading={loadingAnalysis}
-                onOpenReferral={() => openReferral(analysis?.address)}
-                onAskQuestion={() => console.log('Ask a question stub')}
-              />
-            </div>
+                <ResultsCard
+                  analysis={analysis}
+                  loading={false}
+                  onOpenReferral={() => openReferral(analysis?.address)}
+                  onAskQuestion={() => console.log('Ask a question stub')}
+                />
+              </div>
+            )
           )
         ) : (
           <div className="space-y-6">
