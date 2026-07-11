@@ -1,11 +1,49 @@
-import { useState } from 'react'
-import { Sparkles, Zap, ShieldCheck, Clock } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Zap, ShieldCheck, Clock } from 'lucide-react'
 import AddressSearch from './AddressSearch'
 import GoogleHeroMap from './GoogleHeroMap'
+import GoogleStreetView from './GoogleStreetView'
 import LoadingScreen from './LoadingScreen'
 import ResultsCard from './ResultsCard'
 import heroNature from '../../assets/hero-nature.jpg'
 import heroVideo from '../../assets/landing-video.mp4'
+import heroVideoReverse from '../../assets/landing-video-reverse.mp4'
+
+// Scrubbing currentTime backward via requestAnimationFrame looks choppy (video seeking snaps to
+// the nearest keyframe, not a real frame-by-frame reverse). Instead, this plays two real video
+// files — the clip and a pre-rendered reverse encode — swapping which one is visible/playing the
+// instant each one ends, so both playback directions are genuine native decode, not scrubbing.
+function useBoomerangVideo(forwardRef, reverseRef) {
+  const [showReverse, setShowReverse] = useState(false)
+
+  useEffect(() => {
+    const forward = forwardRef.current
+    const reverse = reverseRef.current
+    if (!forward || !reverse) return
+
+    function toReverse() {
+      forward.pause()
+      reverse.currentTime = 0
+      reverse.play().catch(() => {})
+      setShowReverse(true)
+    }
+    function toForward() {
+      reverse.pause()
+      forward.currentTime = 0
+      forward.play().catch(() => {})
+      setShowReverse(false)
+    }
+
+    forward.addEventListener('ended', toReverse)
+    reverse.addEventListener('ended', toForward)
+    return () => {
+      forward.removeEventListener('ended', toReverse)
+      reverse.removeEventListener('ended', toForward)
+    }
+  }, [forwardRef, reverseRef])
+
+  return showReverse
+}
 
 /**
  * Hero
@@ -31,6 +69,10 @@ export default function Hero({
 }) {
   const [mapTarget, setMapTarget] = useState(null)
   const [mapLabel, setMapLabel] = useState(null)
+  const [mapView, setMapView] = useState('map')
+  const forwardVideoRef = useRef(null)
+  const reverseVideoRef = useRef(null)
+  const showReverse = useBoomerangVideo(forwardVideoRef, reverseVideoRef)
 
   function handleCoordinates(coords, text) {
     setMapTarget(coords)
@@ -40,15 +82,29 @@ export default function Hero({
   if (mode === 'search') {
     return (
       <section className="relative h-[calc(100vh-80px)] w-full flex items-center overflow-hidden bg-sky-50">
-        {/* Background video, with the still photo as poster/fallback while it loads */}
+        {/* Two real video files (clip + a pre-rendered reverse encode), cross-faded so the
+            boomerang loop is genuine native playback in both directions, never a scrub. */}
         <video
-          className="absolute inset-0 h-full w-full object-cover"
+          ref={forwardVideoRef}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-150 ${
+            showReverse ? 'opacity-0' : 'opacity-100'
+          }`}
           src={heroVideo}
           poster={heroNature}
           autoPlay
-          loop
           muted
           playsInline
+          preload="auto"
+        />
+        <video
+          ref={reverseVideoRef}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-150 ${
+            showReverse ? 'opacity-100' : 'opacity-0'
+          }`}
+          src={heroVideoReverse}
+          muted
+          playsInline
+          preload="auto"
         />
 
         {/* Legibility wash so text reads cleanly over the sky/foliage regardless of viewport width */}
@@ -60,15 +116,10 @@ export default function Hero({
 
         <div className="animate-fade-slide-in relative mx-auto w-full max-w-7xl px-6 md:px-12">
           <div className="max-w-xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/60 bg-white/60 px-3 py-1 text-xs font-medium text-blue-700 backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5" />
-              Instant, AI-powered solar analysis
-            </span>
-
-            <h1 className="mt-5 text-6xl md:text-7xl font-bold tracking-tight leading-[1.05] text-slate-900">
+            <h1 className="text-6xl md:text-7xl font-bold tracking-tight leading-[1.05] text-slate-900">
               Clean energy,
               <br />
-              <span className="bg-gradient-to-r from-emerald-600 to-sky-500 bg-clip-text text-transparent">
+              <span className="gradient-text">
                 clear savings
               </span>
             </h1>
@@ -145,15 +196,46 @@ export default function Hero({
           )}
         </div>
 
-        {/* Map column: pinned + zoomed to the searched address. Hidden below lg in results
-            mode — there isn't enough room to show it alongside results without squeezing them
-            into overflow, so results get the full width instead. */}
+        {/* Map column: pinned + zoomed to the searched address, with a toggle to switch to an
+            actual photo of the house (Street View) once an address is picked. Hidden below lg
+            in results mode — there isn't enough room to show it alongside results without
+            squeezing them into overflow, so results get the full width instead. */}
         <div
           className={`relative min-w-0 w-full h-full min-h-[280px] ${
             showResults ? 'hidden lg:block lg:order-1' : 'md:order-2'
           }`}
         >
-          <GoogleHeroMap target={mapTarget} label={mapLabel} />
+          {mapTarget && (
+            <div className="absolute left-1/2 top-4 z-10 flex -translate-x-1/2 items-center rounded-full bg-white/90 p-1 text-xs font-medium shadow-md backdrop-blur-sm">
+              <button
+                type="button"
+                onClick={() => setMapView('map')}
+                className={`rounded-full px-3 py-1.5 transition-colors duration-150 ${
+                  mapView === 'map' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Map
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapView('house')}
+                className={`rounded-full px-3 py-1.5 transition-colors duration-150 ${
+                  mapView === 'house' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                House
+              </button>
+            </div>
+          )}
+
+          <div className={mapView === 'map' ? 'h-full w-full' : 'hidden'}>
+            <GoogleHeroMap target={mapTarget} label={mapLabel} />
+          </div>
+          {mapView === 'house' && (
+            <div className="h-full w-full">
+              <GoogleStreetView target={mapTarget} label={mapLabel} />
+            </div>
+          )}
         </div>
       </div>
     </section>

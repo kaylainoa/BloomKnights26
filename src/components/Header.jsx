@@ -1,4 +1,36 @@
-import { Sun } from 'lucide-react'
+function Logo() {
+  return (
+    <svg viewBox="0 0 36 36" className="h-9 w-9" aria-hidden="true">
+      <defs>
+        <linearGradient id="logo-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#1d4ed8" />
+        </linearGradient>
+        <linearGradient id="logo-panel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#bfdbfe" />
+          <stop offset="100%" stopColor="#eff6ff" />
+        </linearGradient>
+      </defs>
+      <rect width="36" height="36" rx="10" fill="url(#logo-bg)" />
+      {/* Sun peeking behind a solar panel */}
+      <circle cx="24" cy="12" r="5.5" fill="#fde68a" />
+      <path
+        d="M8 25.5 17.5 10 27.5 25.5Z"
+        fill="url(#logo-panel)"
+        stroke="#1d4ed8"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12.2 25.5 17.5 15 22.8 25.5M9.6 21h15.8M11 23.2h14"
+        stroke="#1d4ed8"
+        strokeWidth="1"
+        fill="none"
+        opacity="0.55"
+      />
+    </svg>
+  )
+}
 
 export default function Header({ view, onChangeView, onGoHome }) {
   return (
@@ -9,9 +41,7 @@ export default function Header({ view, onChangeView, onGoHome }) {
           onClick={onGoHome}
           className="flex items-center gap-2 rounded-lg transition-opacity duration-150 hover:opacity-70 active:scale-95"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm shadow-blue-600/30">
-            <Sun className="h-5 w-5 text-white" strokeWidth={2.25} />
-          </span>
+          <Logo />
           <span className="text-lg font-bold tracking-tight text-gray-900">SolarScope</span>
         </button>
 
