@@ -117,7 +117,7 @@ export default function App() {
                 Lending opportunity map
               </h1>
               <p className="text-gray-600">
-                Florida and Georgia counties ranked by clean energy financing opportunity.
+                Florida, Georgia, and Alabama counties ranked by clean energy financing opportunity.
               </p>
             </div>
 
