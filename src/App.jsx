@@ -77,11 +77,11 @@ export default function App() {
                 Lending opportunity map
               </h1>
               <p className="text-gray-600">
-                Census tracts ranked by clean energy financing opportunity in Alachua County, FL.
+                Florida counties ranked by clean energy financing opportunity, statewide.
               </p>
             </div>
 
-            <div className="flex flex-col gap-6 md:flex-row">
+            <div className="flex flex-col gap-6 md:h-[720px] md:flex-row">
               <div className="md:w-[60%]">
                 <OpportunityMap
                   features={tractFeatures}
@@ -89,7 +89,7 @@ export default function App() {
                   onSelectTract={setSelectedTractId}
                 />
               </div>
-              <div className="md:w-[40%]">
+              <div className="min-h-0 md:w-[40%]">
                 <TractSidebar
                   features={tractFeatures}
                   selectedTractId={selectedTractId}

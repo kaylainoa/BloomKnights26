@@ -1,4 +1,6 @@
-import tractsGeojson from '../data/tracts.geojson?raw'
+import flCountiesGeojson from '../data/flCounties.geojson?raw'
+import flCountyCensusStats from '../data/flCountyCensusStats.json'
+import { computeOpportunityScore } from '../utils/score'
 import {
   MOCK_ADDRESS_MAP,
   GENERIC_GOOD_SOLAR,
@@ -138,22 +140,208 @@ export async function getPropertyAnalysis(address) {
   return { ...GENERIC_GOOD_SOLAR, address }
 }
 
+const CENSUS_API_KEY = import.meta.env.CENSUS_API_KEY
+const EIA_API_KEY = import.meta.env.EIA_API_KEY
+const NREL_API_KEY = import.meta.env.NREL_API_KEY
+
+const FL_STATE_FIPS = '12'
+const BASELINE_MONTHLY_KWH = 1150 // typical FL residential usage, incl. AC load
+const SOLAR_OFFSET_FRACTION = 0.75 // share of the bill a typically-sized rooftop system offsets
+
+// US Census ACS 5-year: median household income (B19013_001E), population (B01003_001E),
+// and total households (B11001_001E) for every FL county in one call.
+async function fetchCountyCensusStats() {
+  const url = `https://api.census.gov/data/2022/acs/acs5?get=NAME,B19013_001E,B01003_001E,B11001_001E&for=county:*&in=state:${FL_STATE_FIPS}&key=${CENSUS_API_KEY}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Census API ${res.status}`)
+  const [header, ...rows] = await res.json()
+  const idx = Object.fromEntries(header.map((h, i) => [h, i]))
+  const byGeoid = {}
+  rows.forEach((row) => {
+    const geoid = row[idx.state] + row[idx.county]
+    byGeoid[geoid] = {
+      medianIncome: Number(row[idx.B19013_001E]),
+      population: Number(row[idx.B01003_001E]),
+      households: Number(row[idx.B11001_001E]),
+    }
+  })
+  return byGeoid
+}
+
+// EIA API v2: most recent statewide residential retail electricity price (EIA doesn't
+// publish county-level retail rates, so every FL county shares this one figure).
+async function fetchStateElectricityRate() {
+  const url =
+    'https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data[0]=price' +
+    `&facets[stateid][]=FL&facets[sectorid][]=RES&sort[0][column]=period&sort[0][direction]=desc&length=1&api_key=${EIA_API_KEY}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`EIA API ${res.status}`)
+  const json = await res.json()
+  const centsPerKwh = Number(json.response?.data?.[0]?.price)
+  if (!centsPerKwh) throw new Error('EIA API returned no price')
+  return centsPerKwh / 100
+}
+
+// NREL Solar Resource Data: average annual GHI (kWh/m²/day) at a county's centroid —
+// this is what actually varies solar production across the state (panhandle vs. south FL).
+async function fetchCountySolarResource(lat, lng) {
+  const url = `https://developer.nrel.gov/api/solar/solar_resource/v1.json?lat=${lat}&lon=${lng}&api_key=${NREL_API_KEY}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`NREL API ${res.status}`)
+  const json = await res.json()
+  return json.outputs?.avg_ghi?.annual ?? null
+}
+
+// FL's annual GHI genuinely declines with latitude — the peninsula/Keys (~24.5°N) run
+// noticeably sunnier than the panhandle (~31°N). Used whenever NREL is unreachable, so
+// savings still reflects the real north-south solar gradient instead of a flat statewide figure.
+function estimateGhiFromLatitude(lat) {
+  return Math.max(4.9, Math.min(5.6, 5.5 - (lat - 24.5) * 0.077))
+}
+
+function countyCentroid(feature) {
+  const rings =
+    feature.geometry.type === 'Polygon'
+      ? [feature.geometry.coordinates[0]]
+      : feature.geometry.coordinates.map((part) => part[0])
+  let sumLng = 0
+  let sumLat = 0
+  let count = 0
+  rings.forEach((ring) =>
+    ring.forEach(([lng, lat]) => {
+      sumLng += lng
+      sumLat += lat
+      count += 1
+    })
+  )
+  return { lat: sumLat / count, lng: sumLng / count }
+}
+
+// No free live API publishes per-county rooftop solar adoption rates, so adoption is modeled
+// from income + population density: higher-income, denser counties tend to have more existing
+// solar (upfront cost + installer availability), which suppresses their score relative to
+// lower-adoption counties with comparable savings/burden.
+function estimateAdoptionPct({ medianIncome, population, landAreaSqmi }) {
+  const densityPerSqmi = population / landAreaSqmi
+  const raw = 3 + (medianIncome / 100000) * 9 + Math.log10(densityPerSqmi + 1) * 5
+  return Math.round(Math.max(1, Math.min(35, raw)))
+}
+
+// Census's data API sends no CORS headers, so it can never be called directly from a browser —
+// this static snapshot (real 2022 median household income + 2023 population estimates per FL
+// county, sourced from USDA ERS's county-level datasets, which republish the same underlying
+// Census/BEA figures) stands in whenever the live fetchCountyCensusStats() call fails, which in
+// practice is always from a browser. household_count is derived from population using Florida's
+// statewide average household size (~2.5 people), not a directly-sourced figure.
+function staticCensusStats(geoid) {
+  return flCountyCensusStats[geoid] ?? null
+}
+
+async function safely(fn, label) {
+  try {
+    return await fn()
+  } catch (err) {
+    console.warn(`[SolarScope] ${label} unavailable, using estimate:`, err.message)
+    return null
+  }
+}
+
+function buildCountyFeature(feature, { census, ratePerKwh, ghi, avgGhi }) {
+  const { GEOID, name, land_area_sqmi: landAreaSqmi } = feature.properties
+
+  const stats = census ?? staticCensusStats(GEOID)
+  const medianIncome = stats.medianIncome
+  const population = stats.population
+  const households = stats.households ?? Math.round(population / 2.5)
+
+  const estimatedMonthlyBill = BASELINE_MONTHLY_KWH * ratePerKwh
+  const solarResourceFactor = ghi / avgGhi
+  const avgSavingsMo = Math.round(estimatedMonthlyBill * SOLAR_OFFSET_FRACTION * solarResourceFactor)
+  const energyBurdenPct = Math.round(((estimatedMonthlyBill * 12) / medianIncome) * 1000) / 10
+  const adoptionPct = estimateAdoptionPct({ medianIncome, population, landAreaSqmi })
+
+  const opportunityScore = computeOpportunityScore({
+    savings: avgSavingsMo,
+    adoption: adoptionPct,
+    burden: energyBurdenPct,
+  })
+
+  return {
+    ...feature,
+    properties: {
+      GEOID,
+      name,
+      opportunity_score: opportunityScore,
+      avg_savings_mo: avgSavingsMo,
+      adoption_pct: adoptionPct,
+      energy_burden_pct: energyBurdenPct,
+      household_count: households,
+    },
+  }
+}
+
 /**
  * getTractScores()
  * ----------------
- * REAL API: US Census ACS (American Community Survey) for household income / energy burden,
- *   combined with EIA API v2 (https://api.eia.gov/v2/) for retail electricity rates by county,
- *   and NREL/Google Solar API aggregate rooftop potential per tract, plus existing solar
- *   adoption data (utility interconnection filings or Project Sunroof coverage stats).
- * Response shape used: GeoJSON FeatureCollection where each feature.properties has
- *   GEOID, name, opportunity_score, avg_savings_mo, adoption_pct, energy_burden_pct, household_count.
- * Swap point: replace the body of this function with fetch calls to the above APIs, join them
- *   by census tract GEOID, run each tract through utils/score.js computeOpportunityScore(),
- *   and return a FeatureCollection in the same shape as data/tracts.geojson.
+ * REAL API: US Census ACS (median household income, population, households) for all 67 FL
+ *   counties in one call, EIA API v2 for the current statewide residential electricity rate,
+ *   and NREL Solar Resource Data per county centroid for solar production variance across the
+ *   state. Adoption is a modeled heuristic (see estimateAdoptionPct) since no free live API
+ *   publishes per-county solar adoption. Each county is run through utils/score.js
+ *   computeOpportunityScore() to produce a GeoJSON FeatureCollection covering all of Florida.
+ * NOTE: the Census data API does not send CORS headers, so it cannot be called directly from a
+ *   browser regardless of key validity — that source always falls back to the real static
+ *   snapshot in data/flCountyCensusStats.json (see staticCensusStats) unless a server-side proxy
+ *   is added. EIA and NREL do support direct browser calls and are used live whenever their keys
+ *   work; each source fails independently so one outage never blanks out the other two.
  */
 export async function getTractScores() {
-  await delay()
-  return JSON.parse(tractsGeojson)
+  const counties = JSON.parse(flCountiesGeojson).features
+
+  const [censusByGeoid, ratePerKwh] = await Promise.all([
+    CENSUS_API_KEY ? safely(fetchCountyCensusStats, 'Census API') : Promise.resolve(null),
+    EIA_API_KEY ? safely(fetchStateElectricityRate, 'EIA API') : Promise.resolve(null),
+  ])
+
+  const centroidByGeoid = {}
+  counties.forEach((feature) => {
+    centroidByGeoid[feature.properties.GEOID] = countyCentroid(feature)
+  })
+
+  const liveGhiByGeoid = {}
+  if (NREL_API_KEY) {
+    await Promise.all(
+      counties.map(async (feature) => {
+        const geoid = feature.properties.GEOID
+        const { lat, lng } = centroidByGeoid[geoid]
+        liveGhiByGeoid[geoid] = await safely(() => fetchCountySolarResource(lat, lng), `NREL API (${geoid})`)
+      })
+    )
+  }
+
+  // Every county gets an effective GHI — live from NREL where it succeeded, otherwise the
+  // latitude-based estimate — so solar-driven savings always varies geographically instead of
+  // collapsing to one statewide number when NREL is unreachable.
+  const effectiveGhiByGeoid = {}
+  counties.forEach((feature) => {
+    const geoid = feature.properties.GEOID
+    effectiveGhiByGeoid[geoid] = liveGhiByGeoid[geoid] ?? estimateGhiFromLatitude(centroidByGeoid[geoid].lat)
+  })
+  const ghiValues = Object.values(effectiveGhiByGeoid)
+  const avgGhi = ghiValues.reduce((sum, v) => sum + v, 0) / ghiValues.length
+
+  await delay(200)
+
+  const features = counties.map((feature) =>
+    buildCountyFeature(feature, {
+      census: censusByGeoid?.[feature.properties.GEOID] ?? null,
+      ratePerKwh: ratePerKwh ?? FALLBACK_RATE_PER_KWH,
+      ghi: effectiveGhiByGeoid[feature.properties.GEOID],
+      avgGhi,
+    })
+  )
+
+  return { type: 'FeatureCollection', features }
 }
 
 const GEMINI_API_KEY = import.meta.env.GEMINI_API_KEY
